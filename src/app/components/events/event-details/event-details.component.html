@@ -1,0 +1,224 @@
+<!-- Event Details Page -->
+<div class="event-details-page" *ngIf="!isLoading && event">
+
+   <!-- Header with Background Image -->
+   <div class="event-header" [style.background-image]="event.imageUrl ? 'url(' + event.imageUrl + ')' : 'none'">
+      <div class="event-header__overlay"></div>
+      <div class="event-header__content">
+
+         <!-- Navigation -->
+         <div class="event-nav">
+            <button class="nav-back" (click)="navigateToHome()">
+               <span class="nav-icon"><i class="bi bi-arrow-left"></i></span>
+               <span class="nav-text">Voltar</span>
+            </button>
+
+            <div class="nav-actions">
+               <button class="nav-action" (click)="shareEvent()" title="Compartilhar">
+                  <span class="action-icon"><i class="bi bi-share"></i></span>
+               </button>
+               <button *ngIf="isEventCreator" class="nav-action" (click)="editEvent()" title="Editar Evento">
+                  <span class="action-icon"><i class="bi bi-pencil-square"></i></span>
+               </button>
+            </div>
+         </div>
+
+         <!-- Event Title and Status -->
+         <div class="event-hero">
+            <div class="event-status" [class]="getEventStatusClass()">
+               {{ getEventStatusText() }}
+            </div>
+            <h1 class="event-title">{{ event.eventName }}</h1>
+            <div class="event-creator">
+               <img [src]="event.creatorPhotoURL || 'assets/default-avatar.png'" [alt]="event.creatorName"
+                  class="creator-avatar">
+               <span>Organizado por <strong>{{ event.creatorName }}</strong></span>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Event Content -->
+   <div class="event-content">
+      <div class="container">
+
+         <!-- Main Info Cards -->
+         <div class="info-grid">
+
+            <!-- Date & Time Card -->
+            <div class="info-card">
+               <div class="card-icon"><i class="bi bi-calendar-week"></i></div>
+               <div class="card-content">
+                  <h3>Data e Hora</h3>
+                  <p class="primary-text">{{ formatDate(event.eventDate) }}</p>
+                  <p class="secondary-text">{{ formatTime(event.eventDate) }}</p>
+               </div>
+            </div>
+
+            <!-- Location Card -->
+            <div class="info-card">
+               <div class="card-icon"><i class="bi bi-geo-alt-fill"></i></div>
+               <div class="card-content">
+                  <h3>Local</h3>
+                  <p class="primary-text">{{ event.location.address }}</p>
+                  <p class="secondary-text">{{ event.location.city }}, {{ event.location.state }}</p>
+               </div>
+            </div>
+
+            <!-- Age Restriction Card -->
+            <div class="info-card">
+               <div class="card-icon"><i class="bi bi-birthday-cake"></i></div>
+               <div class="card-content">
+                  <h3>Idade Mínima</h3>
+                  <p class="primary-text">{{ event.minAge }}+ anos</p>
+                  <p class="secondary-text">Documento obrigatório</p>
+               </div>
+            </div>
+
+            <!-- Privacy Card -->
+            <div class="info-card">
+              <div class="card-icon">
+                <i class="bi bi-globe-americas" *ngIf="event.privacy === 'aberta'"></i>
+                <i class="bi bi-lock" *ngIf="event.privacy === 'fechada'"></i>
+              </div>
+              <div class="card-content">
+                <h3>Tipo</h3>
+                <p class="primary-text">{{ event.privacy === 'aberta' ? 'Evento Aberto' : 'Evento Fechado' }}</p>
+                <p class="secondary-text">
+                  {{ event.privacy === 'aberta' ? 'Qualquer um pode participar' : 'Requer aprovação' }}
+                </p>
+              </div>
+            </div>
+         </div>
+
+         <!-- Participants Section -->
+         <div class="participants-section">
+            <div class="section-header">
+               <h2><i class="bi bi-people"></i> Participantes</h2>
+               <div class="participants-stats">
+                  <span class="confirmed">{{ event.participants.length }} confirmados</span>
+                  <span class="separator">•</span>
+                  <span class="available">{{ spotsAvailable }} vagas disponíveis</span>
+               </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+               <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="eventProgress"></div>
+               </div>
+               <span class="progress-text">{{ event.participants.length }}/{{ event.maxParticipants }}</span>
+            </div>
+         </div>
+
+         <!-- Event Description -->
+         <div class="description-section" *ngIf="event.details">
+            <h2><i class="bi bi-file-text"></i> Sobre o Evento</h2>
+            <div class="description-content">
+               <p>{{ event.details }}</p>
+            </div>
+         </div>
+
+         <!-- WhatsApp Group Section -->
+         <div class="whatsapp-section" *ngIf="event.whatsappLink && (isUserParticipating || isEventCreator)">
+            <div class="whatsapp-card">
+               <div class="whatsapp-icon"><i class="bi bi-whatsapp"></i></div>
+               <div class="whatsapp-content">
+                  <h3>Grupo do WhatsApp</h3>
+                  <p>Participe do grupo para receber atualizações e se conectar com outros participantes!</p>
+                  <button class="whatsapp-btn" (click)="openWhatsAppGroup()">
+                     <i class="bi bi-chat-dots"></i> Entrar no Grupo
+                  </button>
+               </div>
+            </div>
+         </div>
+
+         <!-- Action Buttons -->
+         <div class="action-section">
+            <!-- Join/Leave Event Button -->
+            <div class="action-buttons" *ngIf="!isEventCreator">
+               <button *ngIf="!isUserParticipating" class="btn btn-primary btn-large" (click)="joinEvent()"
+                  [disabled]="isJoining || isEventFull || isEventPast">
+                  <span *ngIf="!isJoining"><i class="bi bi-check-lg"></i> Confirmar Presença</span>
+                  <span *ngIf="isJoining"><i class="bi bi-hourglass-split"></i> Confirmando...</span>
+               </button>
+
+               <button *ngIf="isUserParticipating" class="btn btn-secondary btn-large" (click)="leaveEvent()"
+                  [disabled]="isLeaving">
+                  <span *ngIf="!isLeaving"><i class="bi bi-x-lg"></i> Cancelar Presença</span>
+                  <span *ngIf="isLeaving"><i class="bi bi-hourglass-split"></i> Cancelando...</span>
+               </button>
+            </div>
+
+            <!-- Creator Actions -->
+            <div class="creator-actions" *ngIf="isEventCreator">
+               <button class="btn btn-outline" (click)="editEvent()">
+                  <i class="bi bi-pencil-square"></i> Editar Evento
+               </button>
+               <button class="btn btn-primary" (click)="openWhatsAppGroup()" *ngIf="event.whatsappLink">
+                  <i class="bi bi-chat-dots"></i> Acessar Grupo
+               </button>
+            </div>
+         </div>
+
+         <!-- Ticket Purchase Section (Future Feature) -->
+         <div class="ticket-section" *ngIf="false">
+            <!-- This section can be enabled when ticket purchasing is implemented -->
+            <div class="ticket-card">
+               <div class="ticket-header">
+                  <h3><i class="bi bi-ticket-perforated"></i> Ingressos</h3>
+                  <div class="ticket-price">R$ 25,00</div>
+               </div>
+               <div class="ticket-content">
+                  <p>Garanta já o seu ingresso para este evento!</p>
+                  <ul class="ticket-includes">
+                     <li><i class="bi bi-check-lg"></i> Entrada no evento</li>
+                     <li><i class="bi bi-check-lg"></i> Acesso ao grupo VIP</li>
+                     <li><i class="bi bi-check-lg"></i> Brindes exclusivos</li>
+                  </ul>
+                  <button class="btn btn-purchase">
+                     <i class="bi bi-credit-card"></i> Comprar Ingresso
+                  </button>
+               </div>
+            </div>
+         </div>
+
+         <!-- Warning Messages -->
+         <div class="warnings" *ngIf="isEventFull || isEventPast">
+            <div class="warning-card warning-full" *ngIf="isEventFull && !isEventPast">
+               <span class="warning-icon"><i class="bi bi-exclamation-triangle"></i></span>
+               <div class="warning-content">
+                  <h4>Evento Lotado</h4>
+                  <p>Este evento atingiu o número máximo de participantes.</p>
+               </div>
+            </div>
+
+            <div class="warning-card warning-past" *ngIf="isEventPast">
+               <span class="warning-icon"><i class="bi bi-hourglass"></i></span>
+               <div class="warning-content">
+                  <h4>Evento Finalizado</h4>
+                  <p>Este evento já aconteceu.</p>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="isLoading">
+   <div class="loading-spinner"></div>
+   <p>Carregando detalhes do evento...</p>
+</div>
+
+<!-- Error State -->
+<div class="error-container" *ngIf="!isLoading && !event">
+   <div class="error-content">
+      <span class="error-icon"><i class="bi bi-emoji-frown"></i></span>
+      <h2>Evento não encontrado</h2>
+      <p>O evento que você está procurando pode ter sido removido ou não existe.</p>
+      <button class="btn btn-primary" (click)="navigateToHome()">
+         <i class="bi bi-house"></i> Voltar para Home
+      </button>
+   </div>
+</div>

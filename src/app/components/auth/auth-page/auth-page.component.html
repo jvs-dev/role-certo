@@ -1,0 +1,62 @@
+<div class="auth-page">
+   <div class="auth-page__container">
+      <div class="auth-page__image-panel">
+         <div class="auth-page__image-overlay">
+            <div class="auth-page__brand">
+               <h1 class="auth-page__brand-title">Bomfest</h1>
+               <p class="auth-page__brand-subtitle">Eventos & Networking</p>
+            </div>
+
+            <div class="auth-page__profile">
+               <div class="auth-page__profile-avatar">
+                  <img src="assets/default-avatar.png" alt="Profile" class="auth-page__profile-image">
+               </div>
+               <div class="auth-page__profile-info">
+                  <h3 class="auth-page__profile-name">Bomfest</h3>
+                  <p class="auth-page__profile-role">Social & Events</p>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="auth-page__form-panel">
+         <div class="auth-page__form-header">
+            <div class="auth-page__toggle">
+               <button class="auth-page__toggle-btn" [class.auth-page__toggle-btn--active]="!isLoginMode"
+                  (click)="isLoginMode = false">
+                  Sign Up
+               </button>
+               <button class="auth-page__toggle-btn" [class.auth-page__toggle-btn--active]="isLoginMode"
+                  (click)="isLoginMode = true">
+                  Join Us
+               </button>
+            </div>
+         </div>
+
+         <div class="auth-page__form-content">
+            <div class="auth-page__welcome">
+               <h1 class="auth-page__welcome-title">
+                  {{ isLoginMode ? 'Welcome to Bomfest' : 'Create Account' }}
+               </h1>
+               <p class="auth-page__welcome-subtitle">
+                  {{ isLoginMode ? 'Welcome to Bomfest' : 'Join Bomfest community' }}
+               </p>
+            </div>
+
+            <div class="auth-page__form">
+               <app-login-form *ngIf="isLoginMode"></app-login-form>
+               <app-register-form *ngIf="!isLoginMode"></app-register-form>
+            </div>
+
+            <div class="auth-page__footer">
+               <p class="auth-page__footer-text">
+                  {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
+                  <a href="#" (click)="toggleMode(); $event.preventDefault()" class="auth-page__footer-link">
+                     {{ isLoginMode ? 'Sign up' : 'Sign in' }}
+                  </a>
+               </p>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

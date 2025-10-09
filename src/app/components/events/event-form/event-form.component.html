@@ -1,0 +1,270 @@
+<!--
+  Página de Criação de Eventos
+  Design multi-step responsivo com tema roxo
+-->
+<div class="page-container">
+  <div class="form-card">
+    <!-- Cabeçalho com o título da página e navegação -->
+    <div class="card-header">
+      <h1 class="header-title">Criar um novo Rolê</h1>
+      <a class="header-link" routerLink="/home">Voltar para Home</a>
+    </div>
+
+    <!-- Indicador de Progresso (Stepper) -->
+    <div class="stepper">
+      <div class="step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+        <div class="step-icon">
+          <span *ngIf="currentStep <= 1">1</span>
+          <span *ngIf="currentStep > 1" class="check-icon"><i class="bi bi-check"></i></span>
+        </div>
+        <div class="step-label">Informações Básicas</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
+        <div class="step-icon">
+          <span *ngIf="currentStep <= 2">2</span>
+          <span *ngIf="currentStep > 2" class="check-icon"><i class="bi bi-check"></i></span>
+        </div>
+        <div class="step-label">Detalhes</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" [class.active]="currentStep === 3">
+        <div class="step-icon">3</div>
+        <div class="step-label">Privacidade</div>
+      </div>
+    </div>
+
+    <!-- Formulário Principal -->
+    <form [formGroup]="eventForm" (ngSubmit)="createEvent()">
+      
+      <!-- Passo 1: Informações Básicas -->
+      <div class="form-step-content" *ngIf="currentStep === 1">
+        <h2 class="step-title">Informações Básicas</h2>
+        <p class="step-subtitle">Comece com o essencial para o seu evento.</p>
+
+        <div class="form-grid">
+          <!-- Nome do Evento -->
+          <div class="form-group span-2">
+            <label for="eventName">Nome do Evento *</label>
+            <input 
+              id="eventName" 
+              formControlName="eventName" 
+              placeholder="Ex: Festa de Halloween Guadalupe"
+              [class.error]="hasError('eventName')"
+            >
+            <span class="error-message" *ngIf="hasError('eventName')">{{ getError('eventName') }}</span>
+          </div>
+
+          <!-- Endereço -->
+          <div class="form-group span-2" formGroupName="location">
+            <label for="address">Endereço Completo *</label>
+            <input 
+              id="address" 
+              formControlName="address" 
+              placeholder="Ex: Rua das Flores, 123 - Bairro"
+              [class.error]="hasError('location.address')"
+            >
+            <span class="error-message" *ngIf="hasError('location.address')">{{ getError('location.address') }}</span>
+          </div>
+
+          <!-- Cidade -->
+          <div class="form-group" formGroupName="location">
+            <label for="city">Cidade *</label>
+            <input 
+              id="city" 
+              formControlName="city" 
+              placeholder="Ex: Salvador"
+              [class.error]="hasError('location.city')"
+            >
+            <span class="error-message" *ngIf="hasError('location.city')">{{ getError('location.city') }}</span>
+          </div>
+
+          <!-- Estado -->
+          <div class="form-group" formGroupName="location">
+            <label for="state">Estado *</label>
+            <input 
+              id="state" 
+              formControlName="state" 
+              placeholder="Ex: BA"
+              [class.error]="hasError('location.state')"
+            >
+            <span class="error-message" *ngIf="hasError('location.state')">{{ getError('location.state') }}</span>
+          </div>
+
+          <!-- Data -->
+          <div class="form-group">
+            <label for="eventDate">Data do Evento *</label>
+            <input 
+              id="eventDate" 
+              type="date" 
+              formControlName="eventDate"
+              [class.error]="hasError('eventDate')"
+            >
+            <span class="error-message" *ngIf="hasError('eventDate')">{{ getError('eventDate') }}</span>
+          </div>
+
+          <!-- Hora -->
+          <div class="form-group">
+            <label for="eventTime">Hora do Evento *</label>
+            <input 
+              id="eventTime" 
+              type="time" 
+              formControlName="eventTime"
+              [class.error]="hasError('eventTime')"
+            >
+            <span class="error-message" *ngIf="hasError('eventTime')">{{ getError('eventTime') }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passo 2: Detalhes -->
+      <div class="form-step-content" *ngIf="currentStep === 2">
+        <h2 class="step-title">Detalhes do Evento</h2>
+        <p class="step-subtitle">Forneça mais informações para os participantes.</p>
+        
+        <div class="form-grid">
+           <!-- Idade Mínima -->
+           <div class="form-group">
+            <label for="minAge">Idade Mínima *</label>
+            <input 
+              id="minAge" 
+              type="number" 
+              formControlName="minAge" 
+              placeholder="18"
+              min="0"
+              max="99"
+              [class.error]="hasError('minAge')"
+            >
+            <span class="error-message" *ngIf="hasError('minAge')">{{ getError('minAge') }}</span>
+          </div>
+
+          <!-- Máximo de Participantes -->
+          <div class="form-group">
+            <label for="maxParticipants">Nº de Participantes *</label>
+            <input 
+              id="maxParticipants" 
+              type="number" 
+              formControlName="maxParticipants" 
+              placeholder="40"
+              min="1"
+              [class.error]="hasError('maxParticipants')"
+            >
+            <span class="error-message" *ngIf="hasError('maxParticipants')">{{ getError('maxParticipants') }}</span>
+          </div>
+          
+          <!-- Link do WhatsApp -->
+          <div class="form-group span-2">
+            <label for="whatsappLink">Link para Grupo do WhatsApp *</label>
+            <input 
+              id="whatsappLink" 
+              formControlName="whatsappLink" 
+              placeholder="https://wa.me/558512345678"
+              [class.error]="hasError('whatsappLink')"
+            >
+            <span class="error-message" *ngIf="hasError('whatsappLink')">{{ getError('whatsappLink') }}</span>
+            <small class="field-hint">Use o formato: https://wa.me/[número] ou https://chat.whatsapp.com/[código]</small>
+          </div>
+
+          <!-- Detalhes Adicionais -->
+          <div class="form-group span-2">
+            <label for="details">Informações Adicionais</label>
+            <textarea 
+              id="details" 
+              formControlName="details" 
+              rows="4" 
+              placeholder="Ex: Traga sua bebida, teremos petiscos, música ao vivo..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Passo 3: Privacidade e Banner -->
+      <div class="form-step-content" *ngIf="currentStep === 3">
+        <h2 class="step-title">Privacidade e Imagem</h2>
+        <p class="step-subtitle">Defina quem pode ver seu evento e adicione um toque visual.</p>
+        
+        <div class="form-grid">
+          <!-- Opções de Privacidade -->
+          <div class="form-group span-2">
+            <label>Privacidade do Evento *</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" value="aberta" formControlName="privacy">
+                <span class="radio-icon"><i class="bi bi-globe-americas"></i></span>
+                <div class="radio-content">
+                  <span class="radio-title">Aberto</span>
+                  <span class="radio-description">Qualquer um pode ver e participar</span>
+                </div>
+              </label>
+              <label class="radio-label">
+                <input type="radio" value="fechada" formControlName="privacy">
+                <span class="radio-icon"><i class="bi bi-lock"></i></span>
+                <div class="radio-content">
+                  <span class="radio-title">Fechado</span>
+                  <span class="radio-description">Requer aprovação para participar</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- URL da Imagem -->
+          <div class="form-group span-2">
+            <label for="imageUrl">URL da Imagem do Evento (Opcional)</label>
+            <input 
+              id="imageUrl" 
+              formControlName="imageUrl" 
+              placeholder="https://exemplo.com/imagem.jpg"
+              (input)="onImageUrlChange()"
+              [class.error]="hasError('imageUrl')"
+            >
+            <span class="error-message" *ngIf="hasError('imageUrl')">{{ getError('imageUrl') }}</span>
+            <small class="field-hint">Cole o link de uma imagem hospedada online (JPG, PNG, GIF, WebP)</small>
+            
+            <!-- Preview da Imagem -->
+            <div class="image-preview-container" *ngIf="imagePreview">
+              <div class="image-preview">
+                <img [src]="imagePreview" alt="Preview do evento" (error)="imagePreview = null">
+                <button type="button" class="remove-image" (click)="eventForm.get('imageUrl')?.setValue(''); imagePreview = null">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botões de Navegação do Formulário -->
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          *ngIf="currentStep > 1" 
+          (click)="prevStep()"
+          [disabled]="isLoading"
+        >
+          <i class="bi bi-arrow-left"></i> Anterior
+        </button>
+        
+        <div class="spacer"></div>
+        
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          *ngIf="currentStep < 3" 
+          (click)="nextStep()"
+          [disabled]="isLoading"
+        >
+          Próximo <i class="bi bi-arrow-right"></i>
+        </button>
+        
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-create" 
+          *ngIf="currentStep === 3" 
+          [disabled]="eventForm.invalid || isLoading"
+        >
+          <span *ngIf="!isLoading"><i class="bi bi-plus-lg"></i> Criar Evento</span>
+          <span *ngIf="isLoading"><i class="bi bi-hourglass-split"></i> Criando...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
