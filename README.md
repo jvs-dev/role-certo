@@ -1,3 +1,38 @@
+# Role Certo
+
+An Angular application for event management with Firebase backend.
+
+## Deployment to Vercel
+
+This application is configured for deployment to Vercel. The configuration includes:
+
+1. Proper version alignment for Angular dependencies
+2. Vercel build configuration in `vercel.json`
+3. Static asset handling
+4. Routing configuration for SPA
+
+## Development
+
+To run locally:
+```bash
+npm install
+npm start
+```
+
+To build for production:
+```bash
+npm run build
+```
+
+## Deployment
+
+Simply connect this repository to Vercel. The build process will automatically:
+1. Install dependencies
+2. Build the Angular application
+3. Deploy to Vercel's CDN
+
+The application will be available at your Vercel URL.
+
 # RoleCerto
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.17.
