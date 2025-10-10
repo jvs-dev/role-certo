@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { EventService } from '../../../services/event.service';
@@ -30,23 +30,31 @@ export class HomePageComponent implements OnInit, OnDestroy {
   isMobileMenuOpen = false;
   
   private destroy$ = new Subject<void>();
+  private isBrowser: boolean;
 
   constructor(
     private eventService: EventService,
     private authService: AuthService,
     private loadingService: LoadingService,
     private toastService: ToastService,
-    private router: Router
-  ) {}
+    private router: Router,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit(): void {
-    this.initializeCarousel();
+    if (this.isBrowser) {
+      this.initializeCarousel();
+    }
     
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.currentUser = user;
-        this.loadInitialEvents();
+        if (this.isBrowser) {
+          this.loadInitialEvents();
+        }
       });
 
     this.loadingService.loading$
@@ -113,7 +121,7 @@ export class HomePageComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll', ['$event'])
   onScroll(): void {
-    if (this.isSearching || this.isLoadingMore || !this.hasMoreEvents) {
+    if (!this.isBrowser || this.isSearching || this.isLoadingMore || !this.hasMoreEvents) {
       return;
     }
 
@@ -177,11 +185,15 @@ export class HomePageComponent implements OnInit, OnDestroy {
   
   // Carousel Methods
   private initializeCarousel(): void {
+    if (!this.isBrowser) return;
+    
     this.updateCarouselSettings();
     window.addEventListener('resize', () => this.updateCarouselSettings());
   }
   
   private updateCarouselSettings(): void {
+    if (!this.isBrowser) return;
+    
     const width = window.innerWidth;
     if (width >= 1024) {
       this.visibleSlides = 3;

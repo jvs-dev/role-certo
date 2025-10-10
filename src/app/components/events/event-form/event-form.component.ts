@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { EventService } from '../../../services/event.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { LoadingService } from '../../../services/loading.service';
-import { EventFormData } from '../../../models/interfaces';
+import { Event, EventFormData } from '../../../models/interfaces';
 
 @Component({
   selector: 'app-event-form',
@@ -20,20 +21,33 @@ export class EventFormComponent implements OnInit {
   maxSteps = 3;
   imagePreview: string | null = null;
   isLoading = false;
+  isVerifyingLocation = false;
+  locationVerified = false;
+  isEditMode = false;
+  eventId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private eventService: EventService,
     private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
     private toastService: ToastService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private http: HttpClient
   ) {
     this.eventForm = this.createForm();
   }
 
   ngOnInit(): void {
-    // Initialize form validation and setup
+    // Check if we're in edit mode
+    this.route.params.subscribe(params => {
+      if (params['id']) {
+        this.isEditMode = true;
+        this.eventId = params['id'];
+        this.loadEventData();
+      }
+    });
   }
 
   private createForm(): FormGroup {
@@ -44,6 +58,7 @@ export class EventFormComponent implements OnInit {
         city: ['', Validators.required],
         state: ['', Validators.required]
       }),
+      coordinates: [null],
       eventDate: ['', Validators.required],
       eventTime: ['', Validators.required],
       minAge: [18, [Validators.required, Validators.min(0), Validators.max(99)]],
@@ -53,6 +68,70 @@ export class EventFormComponent implements OnInit {
       privacy: ['aberta', Validators.required],
       imageUrl: ['', [Validators.pattern(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i)]] // Optional image URL with validation
     });
+  }
+
+  private async loadEventData(): Promise<void> {
+    if (!this.eventId) return;
+
+    this.isLoading = true;
+    this.loadingService.show('loading-event');
+
+    try {
+      const event = await this.eventService.getEvent(this.eventId);
+      
+      if (!event) {
+        this.toastService.showError('Evento não encontrado');
+        this.router.navigate(['/home']);
+        return;
+      }
+
+      // Check if current user is the creator
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser || event.creatorId !== currentUser.uid) {
+        this.toastService.showError('Você não tem permissão para editar este evento');
+        this.router.navigate(['/evento', this.eventId]);
+        return;
+      }
+
+      // Format date for the form (YYYY-MM-DD)
+      const formattedDate = event.eventDate.toISOString().split('T')[0];
+      
+      // Set form values
+      this.eventForm.patchValue({
+        eventName: event.eventName,
+        location: {
+          address: event.location.address,
+          city: event.location.city,
+          state: event.location.state
+        },
+        coordinates: event.coordinates || null,
+        eventDate: formattedDate,
+        eventTime: event.eventTime,
+        minAge: event.minAge,
+        maxParticipants: event.maxParticipants,
+        whatsappLink: event.whatsappLink,
+        details: event.details,
+        privacy: event.privacy,
+        imageUrl: event.imageUrl || ''
+      });
+
+      // Update image preview if imageUrl exists
+      if (event.imageUrl) {
+        this.imagePreview = event.imageUrl;
+      }
+
+      // Set location verified flag if coordinates exist
+      this.locationVerified = !!event.coordinates;
+
+      this.toastService.showSuccess('Dados do evento carregados com sucesso!');
+    } catch (error) {
+      console.error('Error loading event data:', error);
+      this.toastService.showError('Erro ao carregar dados do evento');
+      this.router.navigate(['/home']);
+    } finally {
+      this.isLoading = false;
+      this.loadingService.hide('loading-event');
+    }
   }
 
   nextStep(): void {
@@ -131,6 +210,59 @@ export class EventFormComponent implements OnInit {
     }
   }
 
+  async verifyLocation(): Promise<void> {
+    const locationGroup = this.eventForm.get('location');
+    if (!locationGroup) return;
+
+    const address = locationGroup.get('address')?.value;
+    const city = locationGroup.get('city')?.value;
+    const state = locationGroup.get('state')?.value;
+
+    if (!address || !city || !state) {
+      this.toastService.showError('Preencha todos os campos de endereço.');
+      return;
+    }
+
+    this.isVerifyingLocation = true;
+    this.locationVerified = false;
+
+    try {
+      const fullAddress = `${address}, ${city}, ${state}, Brazil`;
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(fullAddress)}&format=json&limit=1`;
+      
+      const response = await this.http.get<any[]>(url, {
+        headers: { 'User-Agent': 'BoomfestApp/1.0' }
+      }).toPromise();
+
+      if (response && response.length > 0) {
+        const result = response[0];
+        this.eventForm.patchValue({
+          coordinates: {
+            lat: parseFloat(result.lat),
+            lng: parseFloat(result.lon)
+          }
+        });
+        this.locationVerified = true;
+        this.toastService.showSuccess('Localização verificada com sucesso!');
+      } else {
+        this.toastService.showError('Endereço não encontrado. Verifique os dados.');
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      this.toastService.showError('Erro ao verificar localização.');
+    } finally {
+      this.isVerifyingLocation = false;
+    }
+  }
+
+  async onSubmit(): Promise<void> {
+    if (this.isEditMode) {
+      this.updateEvent();
+    } else {
+      this.createEvent();
+    }
+  }
+
   async createEvent(): Promise<void> {
     if (this.eventForm.valid) {
       this.isLoading = true;
@@ -152,6 +284,7 @@ export class EventFormComponent implements OnInit {
             city: formValue.location.city,
             state: formValue.location.state
           },
+          coordinates: formValue.coordinates || null,
           eventDate: formValue.eventDate,
           eventTime: formValue.eventTime,
           minAge: formValue.minAge,
@@ -182,6 +315,51 @@ export class EventFormComponent implements OnInit {
     } else {
       this.toastService.showError('Por favor, preencha todos os campos obrigatórios.');
       this.markAllFieldsAsTouched();
+    }
+  }
+
+  async updateEvent(): Promise<void> {
+    if (!this.eventId || !this.eventForm.valid) {
+      if (!this.eventForm.valid) {
+        this.toastService.showError('Por favor, preencha todos os campos obrigatórios.');
+        this.markAllFieldsAsTouched();
+      }
+      return;
+    }
+
+    this.isLoading = true;
+    this.loadingService.show('updating-event');
+
+    try {
+      const formValue = this.eventForm.value;
+      const eventData: Partial<EventFormData> = {
+        eventName: formValue.eventName,
+        location: {
+          address: formValue.location.address,
+          city: formValue.location.city,
+          state: formValue.location.state
+        },
+        coordinates: formValue.coordinates || null,
+        eventDate: formValue.eventDate,
+        eventTime: formValue.eventTime,
+        minAge: formValue.minAge,
+        maxParticipants: formValue.maxParticipants,
+        whatsappLink: formValue.whatsappLink,
+        details: formValue.details,
+        privacy: formValue.privacy,
+        imageUrl: formValue.imageUrl || undefined
+      };
+
+      await this.eventService.updateEvent(this.eventId, eventData);
+
+      this.toastService.showSuccess('Evento atualizado com sucesso!');
+      this.router.navigate(['/evento', this.eventId]);
+    } catch (error) {
+      console.error('Error updating event:', error);
+      this.toastService.showError('Erro ao atualizar evento. Tente novamente.');
+    } finally {
+      this.isLoading = false;
+      this.loadingService.hide('updating-event');
     }
   }
 
@@ -225,5 +403,15 @@ export class EventFormComponent implements OnInit {
       }
     }
     return '';
+  }
+
+  // Method to determine submit button text
+  getSubmitButtonText(): string {
+    return this.isEditMode ? 'Atualizar Evento' : 'Criar Evento';
+  }
+
+  // Method to determine page title
+  getPageTitle(): string {
+    return this.isEditMode ? 'Editar Evento' : 'Criar Novo Evento';
   }
 }

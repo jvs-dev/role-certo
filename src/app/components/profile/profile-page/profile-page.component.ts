@@ -134,12 +134,19 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     this.router.navigate(['/evento', eventId]);
   }
 
-  navigateToEditProfile(): void {
-    this.router.navigate(['/perfil/editar']);
-  }
-
   navigateToHome(): void {
     this.router.navigate(['/home']);
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await this.authService.signOut();
+      this.toastService.showSuccess('Logout realizado com sucesso!');
+      this.router.navigate(['/auth']);
+    } catch (error) {
+      console.error('Error during logout:', error);
+      this.toastService.showError('Erro ao fazer logout');
+    }
   }
 
   // Utility methods for template

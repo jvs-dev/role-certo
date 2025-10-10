@@ -9,6 +9,7 @@
 
         <ul class="home-page__nav-menu">
           <li><a href="#" class="home-page__nav-link home-page__nav-link--active">Festas</a></li>
+          <li><a routerLink="/mapa" class="home-page__nav-link">Mapa</a></li>
           <li><a href="#" class="home-page__nav-link">Experiências</a></li>
           <li><a href="#" class="home-page__nav-link">Contato</a></li>
         </ul>
@@ -17,13 +18,6 @@
           <button class="home-page__nav-cart"><i class="bi bi-ticket"></i></button>
           <button class="home-page__nav-profile" (click)="navigateToProfile()"><i class="bi bi-person"></i></button>
         </div>
-
-        <!-- Mobile Menu Toggle -->
-        <button class="home-page__mobile-toggle" (click)="toggleMobileMenu()">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
       </div>
     </nav>
   </header>
@@ -36,7 +30,8 @@
 
     <div class="home-page__hero-content">
       <h1 class="home-page__hero-title">Achar um rolê nunca foi tão fácil.</h1>
-      <p class="home-page__hero-subtitle"><!-- {{ getUserWelcomeMessage() }} E hoje é aonde? -->Chega de tédio. A resenha perfeita está a um clique de distância.</p>
+      <p class="home-page__hero-subtitle"><!-- {{ getUserWelcomeMessage() }} E hoje é aonde? -->Chega de tédio. A
+        resenha perfeita está a um clique de distância.</p>
     </div>
   </section>
 
@@ -62,6 +57,11 @@
             <option value="oldest">Oldest</option>
             <option value="popular">Popular</option>
           </select>
+
+          <button class="home-page__map-btn" routerLink="/mapa" title="Ver eventos no mapa">
+            <i class="bi bi-map"></i>
+            Mapa
+          </button>
         </div>
       </div>
     </div>

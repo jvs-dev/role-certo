@@ -1,0 +1,44 @@
+<div class="map-page">
+  <!-- Header -->
+  <header class="map-header">
+    <div class="header-content">
+      <h1><i class="bi bi-map"></i> Mapa de Eventos</h1>
+      <p>Encontre eventos próximos a você</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/home" class="btn btn-back">
+        <i class="bi bi-arrow-left"></i> Voltar
+      </a>
+      <a routerLink="/criar-evento" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Criar Evento
+      </a>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Carregando eventos...</p>
+  </div>
+
+  <!-- Map Container -->
+  <div class="map-container" *ngIf="!isLoading">
+    <div id="map"></div>
+    
+    <!-- Info Box -->
+    <div class="info-box">
+      <i class="bi bi-info-circle"></i>
+      <span>{{ events.length }} eventos no mapa</span>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && events.length === 0">
+    <i class="bi bi-map"></i>
+    <h2>Nenhum evento no mapa</h2>
+    <p>Ainda não há eventos com localização. Seja o primeiro!</p>
+    <a routerLink="/criar-evento" class="btn btn-primary">
+      <i class="bi bi-plus-lg"></i> Criar Primeiro Evento
+    </a>
+  </div>
+</div>

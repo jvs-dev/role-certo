@@ -64,6 +64,74 @@
     }
   }
   
+  &__remember {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin: var(--spacing-sm) 0 0 0;
+  }
+  
+  &__checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    user-select: none;
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    
+    &:hover .login-form__checkbox-custom {
+      border-color: var(--primary-color);
+    }
+  }
+  
+  &__checkbox-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    
+    &:checked + .login-form__checkbox-custom {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      
+      &::after {
+        display: block;
+      }
+    }
+    
+    &:focus + .login-form__checkbox-custom {
+      box-shadow: 0 0 0 3px rgba(139, 95, 191, 0.1);
+    }
+  }
+  
+  &__checkbox-custom {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--gray-300);
+    border-radius: 3px;
+    background-color: var(--white);
+    transition: all var(--transition-normal);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      display: none;
+      left: 5px;
+      top: 2px;
+      width: 4px;
+      height: 8px;
+      border: solid var(--white);
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+  
+  &__checkbox-text {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+  }
+  
   &__divider {
     position: relative;
     text-align: center;

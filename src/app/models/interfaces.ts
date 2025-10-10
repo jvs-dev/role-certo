@@ -20,6 +20,10 @@ export interface Event {
     city: string;
     state: string;
   };
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
   eventDate: Date;
   eventTime: string;
   minAge: number;
@@ -41,6 +45,10 @@ export interface EventFormData {
     city: string;
     state: string;
   };
+  coordinates?: {
+    lat: number;
+    lng: number;
+  } | null;
   eventDate: string;
   eventTime: string;
   minAge: number;

@@ -277,6 +277,8 @@ input, textarea, select {
   font-size: 1rem;
   transition: all 0.3s ease;
   background: white;
+  width: 100%; // Ensure inputs don't overflow
+  box-sizing: border-box;
   
   &:focus {
     outline: none;
@@ -312,6 +314,8 @@ textarea {
   color: $text-light;
   font-size: 0.8rem;
   margin-top: 0.25rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 // Radio group
@@ -336,10 +340,15 @@ textarea {
   transition: all 0.3s ease;
   flex: 1;
   background: white;
+  min-width: 0; // Prevent overflow
 
   &:hover {
     border-color: $primary-purple-light;
     background: $secondary-purple;
+  }
+
+  @media (max-width: $mobile) {
+    width: 100%;
   }
 
   input[type="radio"] {
@@ -394,6 +403,8 @@ textarea {
 // Image preview
 .image-preview-container {
   margin-top: 1rem;
+  width: 100%;
+  overflow: hidden;
 }
 
 .image-preview {
@@ -405,10 +416,12 @@ textarea {
   background: $light-purple;
   padding: 0.5rem;
   max-width: 100%;
+  box-sizing: border-box;
 
   img {
     max-width: 300px;
     max-height: 200px;
+    width: 100%;
     border-radius: 8px;
     object-fit: cover;
     display: block;
@@ -456,6 +469,7 @@ textarea {
   margin-top: 3rem;
   padding-top: 2rem;
   border-top: 1px solid $border-light;
+  width: 100%;
 
   @media (max-width: $mobile) {
     flex-direction: column;
@@ -486,6 +500,7 @@ textarea {
   text-decoration: none;
   min-width: 120px;
   justify-content: center;
+  box-sizing: border-box;
 
   &:disabled {
     opacity: 0.5;
@@ -496,6 +511,7 @@ textarea {
   @media (max-width: $mobile) {
     width: 100%;
     padding: 1rem;
+    min-width: 0;
   }
 }
 
@@ -552,10 +568,22 @@ textarea {
   
   .radio-group {
     gap: 0.75rem;
+    width: 100%;
   }
   
   .upload-box {
     padding: 1.5rem 1rem;
+  }
+  
+  // Ensure form elements don't overflow
+  input, textarea, select {
+    min-width: 0;
+  }
+  
+  // Prevent long words from breaking layout
+  label, .step-title, .step-subtitle, .header-title {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 }
 
@@ -581,4 +609,74 @@ select:focus {
   outline: 2px solid $primary-purple;
   outline-offset: 2px;
   border-radius: 12px;
+}
+
+// Address input with verification button
+.address-input-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+
+  input {
+    flex: 1;
+    min-width: 0; // Prevents flex item from overflowing
+  }
+
+  @media (max-width: $mobile) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+.btn-verify-location {
+  padding: 0.75rem 1.25rem;
+  background: $primary-purple;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+
+  &:hover:not(:disabled) {
+    background: $primary-purple-dark;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  i {
+    font-size: 1rem;
+  }
+
+  @media (max-width: $mobile) {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    white-space: normal; // Allow text to wrap on mobile
+  }
+}
+
+.location-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: $success-color;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+
+  i {
+    font-size: 1rem;
+  }
 }

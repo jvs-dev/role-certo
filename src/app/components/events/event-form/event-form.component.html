@@ -1,12 +1,12 @@
 <!--
-  Página de Criação de Eventos
+  Página de Criação/Edição de Eventos
   Design multi-step responsivo com tema roxo
 -->
 <div class="page-container">
   <div class="form-card">
     <!-- Cabeçalho com o título da página e navegação -->
     <div class="card-header">
-      <h1 class="header-title">Criar um novo Rolê</h1>
+      <h1 class="header-title">{{ getPageTitle() }}</h1>
       <a class="header-link" routerLink="/home">Voltar para Home</a>
     </div>
 
@@ -35,7 +35,7 @@
     </div>
 
     <!-- Formulário Principal -->
-    <form [formGroup]="eventForm" (ngSubmit)="createEvent()">
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
       
       <!-- Passo 1: Informações Básicas -->
       <div class="form-step-content" *ngIf="currentStep === 1">
@@ -58,13 +58,30 @@
           <!-- Endereço -->
           <div class="form-group span-2" formGroupName="location">
             <label for="address">Endereço Completo *</label>
-            <input 
-              id="address" 
-              formControlName="address" 
-              placeholder="Ex: Rua das Flores, 123 - Bairro"
-              [class.error]="hasError('location.address')"
-            >
+            <div class="address-input-wrapper">
+              <input 
+                id="address" 
+                formControlName="address" 
+                placeholder="Ex: Rua das Flores, 123 - Bairro"
+                [class.error]="hasError('location.address')"
+              >
+              <button 
+                type="button" 
+                class="btn-verify-location" 
+                (click)="verifyLocation()"
+                [disabled]="isVerifyingLocation"
+                title="Verificar Localização"
+              >
+                <i class="bi bi-geo-alt" *ngIf="!isVerifyingLocation && !locationVerified"></i>
+                <i class="bi bi-hourglass-split" *ngIf="isVerifyingLocation"></i>
+                <i class="bi bi-check-circle-fill" *ngIf="!isVerifyingLocation && locationVerified"></i>
+                {{ isVerifyingLocation ? 'Verificando...' : (locationVerified ? 'Verificado' : 'Verificar') }}
+              </button>
+            </div>
             <span class="error-message" *ngIf="hasError('location.address')">{{ getError('location.address') }}</span>
+            <small class="location-hint" *ngIf="locationVerified">
+              <i class="bi bi-check-circle"></i> Localização verificada! O evento aparecerá no mapa.
+            </small>
           </div>
 
           <!-- Cidade -->
@@ -261,8 +278,8 @@
           *ngIf="currentStep === 3" 
           [disabled]="eventForm.invalid || isLoading"
         >
-          <span *ngIf="!isLoading"><i class="bi bi-plus-lg"></i> Criar Evento</span>
-          <span *ngIf="isLoading"><i class="bi bi-hourglass-split"></i> Criando...</span>
+          <span *ngIf="!isLoading"><i class="bi bi-plus-lg"></i> {{ getSubmitButtonText() }}</span>
+          <span *ngIf="isLoading"><i class="bi bi-hourglass-split"></i> Processando...</span>
         </button>
       </div>
     </form>

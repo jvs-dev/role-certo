@@ -62,7 +62,7 @@ $desktop: 1280px;
   margin-bottom: 2rem;
 }
 
-.nav-back, .nav-edit {
+.nav-back, .nav-logout {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -82,9 +82,16 @@ $desktop: 1280px;
   }
 
   @media (max-width: $mobile) {
-    .nav-text, .edit-text {
+    .nav-text, .logout-text {
       display: none;
     }
+  }
+}
+
+.nav-logout {
+  &:hover {
+    background: rgba(239, 68, 68, 0.8);
+    color: white;
   }
 }
 

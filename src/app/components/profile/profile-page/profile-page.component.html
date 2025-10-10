@@ -15,11 +15,11 @@
         
         <button 
           *ngIf="isOwnProfile" 
-          class="nav-edit" 
-          (click)="navigateToEditProfile()"
+          class="nav-logout" 
+          (click)="logout()"
         >
-          <span class="edit-icon"><i class="bi bi-pencil"></i></span>
-          <span class="edit-text">Editar</span>
+          <span class="logout-icon"><i class="bi bi-box-arrow-right"></i></span>
+          <span class="logout-text">Sair</span>
         </button>
       </div>
       
@@ -222,8 +222,8 @@
       
       <!-- Action Button for Own Profile -->
       <div class="profile-actions" *ngIf="isOwnProfile">
-        <button class="btn btn-outline btn-large" (click)="navigateToEditProfile()">
-          <i class="bi bi-pencil"></i> Editar Perfil
+        <button class="btn btn-outline btn-large" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i> Sair da Conta
         </button>
         <button class="btn btn-primary btn-large" routerLink="/criar-evento">
           <i class="bi bi-plus-lg"></i> Criar Evento

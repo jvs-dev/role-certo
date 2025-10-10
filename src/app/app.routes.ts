@@ -42,8 +42,8 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'perfil/editar',
-    loadComponent: () => import('./components/profile/profile-edit/profile-edit.component').then(m => m.ProfileEditComponent),
+    path: 'mapa',
+    loadComponent: () => import('./components/map/map-page/map-view.component').then(m => m.MapViewComponent),
     canActivate: [AuthGuard]
   },
   {
