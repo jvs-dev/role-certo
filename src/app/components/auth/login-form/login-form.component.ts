@@ -15,6 +15,7 @@ import { LoadingService } from '../../../services/loading.service';
 export class LoginFormComponent implements OnDestroy {
   loginForm: FormGroup;
   isLoading = false;
+  showPassword = false; // Add this property for password visibility toggle
   private isBrowser: boolean;
   private autoLoginAttempted = false;
 
@@ -51,6 +52,11 @@ export class LoginFormComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     // Component cleanup if needed
+  }
+
+  // Add this method to toggle password visibility
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   async onSubmit(): Promise<void> {

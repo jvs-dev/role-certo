@@ -10,6 +10,13 @@
     position: relative;
   }
   
+  // Add container for password input and toggle button
+  &__password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
   &__input {
     width: 100%;
     padding: var(--spacing-md) var(--spacing-lg);
@@ -18,6 +25,11 @@
     font-size: var(--font-size-base);
     transition: all var(--transition-normal);
     background: var(--white);
+    
+    // Add padding to the right to accommodate the toggle button
+    &--password {
+      padding-right: calc(var(--spacing-lg) + 30px);
+    }
     
     &::placeholder {
       color: var(--gray-400);
@@ -36,6 +48,43 @@
         border-color: var(--error);
         box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
       }
+    }
+  }
+  
+  // Style for the password toggle button
+  &__password-toggle {
+    position: absolute;
+    right: var(--spacing-sm);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-sm);
+    transition: background-color var(--transition-normal);
+    
+    &:hover {
+      background-color: var(--gray-100);
+    }
+    
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(139, 95, 191, 0.1);
+    }
+  }
+  
+  // Style for the password icon
+  &__password-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-500);
+    
+    // Add transition for icon change
+    &--visible {
+      color: var(--primary-color);
     }
   }
   
@@ -224,6 +273,10 @@
     
     &__input {
       padding: var(--spacing-sm) var(--spacing-md);
+      
+      &--password {
+        padding-right: calc(var(--spacing-md) + 30px);
+      }
     }
     
     &__btn {
