@@ -11,6 +11,7 @@
   
   // Secondary Colors
   --secondary-color: #667EEA;
+  --secondary-color-dark: #4F46E5;
   --secondary-light: #A4CAFE;
   
   // Neutral Colors
@@ -30,7 +31,7 @@
   --success: #10B981;
   --warning: #F59E0B;
   --error: #EF4444;
-  --info: --secondary-color;
+  --info: var(--secondary-color);
   
   // Gradients
   --gradient-primary: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
