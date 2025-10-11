@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:role-certo": "node dist/role-certo/server/server.mjs",
-    "vercel-build": "ng build --base-href=/"
+    "vercel-build": "ng build --configuration=vercel --base-href=/"
   },
   "private": true,
   "dependencies": {
