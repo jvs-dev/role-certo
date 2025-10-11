@@ -167,6 +167,30 @@ export class EventDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  async deleteEvent(): Promise<void> {
+    if (!this.isEventCreator || !this.event) {
+      return;
+    }
+
+    // Confirm with user before deletion
+    const confirmed = confirm('Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      this.loadingService.show('delete-event');
+      await this.eventService.deleteEvent(this.event.eventId);
+      this.toastService.showSuccess('Evento excluído com sucesso!');
+      this.router.navigate(['/home']);
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      this.toastService.showError('Erro ao excluir evento. Tente novamente.');
+    } finally {
+      this.loadingService.hide('delete-event');
+    }
+  }
+
   openWhatsAppGroup(): void {
     if (this.event?.whatsappLink) {
       window.open(this.event.whatsappLink, '_blank');

@@ -600,6 +600,7 @@
     &:disabled {
       opacity: 0.3;
       cursor: not-allowed;
+      display: none;
     }
 
     &--prev {
@@ -777,7 +778,7 @@
       width: 48px;
       height: 48px;
       font-size: var(--font-size-lg);
-      
+
       &:hover {
         background: var(--secondary-color-dark, #5f3dc4);
       }

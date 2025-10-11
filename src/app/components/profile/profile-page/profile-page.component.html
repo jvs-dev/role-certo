@@ -1,44 +1,37 @@
 <!-- Profile Page -->
 <div class="profile-page" *ngIf="!isLoading && user">
-  
+
   <!-- Header Section -->
   <div class="profile-header">
     <div class="header-background"></div>
     <div class="header-content">
-      
+
       <!-- Navigation -->
       <div class="profile-nav">
         <button class="nav-back" (click)="navigateToHome()">
           <span class="nav-icon"><i class="bi bi-arrow-left"></i></span>
           <span class="nav-text">Home</span>
         </button>
-        
-        <button 
-          *ngIf="isOwnProfile" 
-          class="nav-logout" 
-          (click)="logout()"
-        >
+
+        <button *ngIf="isOwnProfile" class="nav-logout" (click)="logout()">
           <span class="logout-icon"><i class="bi bi-box-arrow-right"></i></span>
           <span class="logout-text">Sair</span>
         </button>
       </div>
-      
+
       <!-- Profile Info -->
       <div class="profile-info">
         <div class="profile-avatar">
-          <img 
-            [src]="user.photoURL || 'assets/default-avatar.png'" 
-            [alt]="user.displayName"
-            class="avatar-image"
-          >
+          <img [src]="user.photoURL || 'assets/default-avatar.png'" [alt]="user.displayName" class="avatar-image">
         </div>
-        
+
         <div class="profile-details">
           <h1 class="profile-name">{{ user.displayName || 'Usuário' }}</h1>
           <p class="profile-email">{{ user.email }}</p>
           <div class="profile-location" *ngIf="user.location.city || user.location.state">
             <span class="location-icon"><i class="bi bi-geo-alt"></i></span>
-            <span>{{ user.location.city }}{{ user.location.city && user.location.state ? ', ' : '' }}{{ user.location.state }}</span>
+            <span>{{ user.location.city }}{{ user.location.city && user.location.state ? ', ' : '' }}{{
+              user.location.state }}</span>
           </div>
         </div>
       </div>
@@ -48,7 +41,7 @@
   <!-- Content Section -->
   <div class="profile-content">
     <div class="container">
-      
+
       <!-- Stats Cards -->
       <div class="stats-grid">
         <div class="stat-card">
@@ -58,7 +51,7 @@
             <p>Eventos Criados</p>
           </div>
         </div>
-        
+
         <div class="stat-card">
           <div class="stat-icon"><i class="bi bi-ticket"></i></div>
           <div class="stat-content">
@@ -66,7 +59,7 @@
             <p>Eventos Participando</p>
           </div>
         </div>
-        
+
         <div class="stat-card">
           <div class="stat-icon"><i class="bi bi-star"></i></div>
           <div class="stat-content">
@@ -88,21 +81,13 @@
       <div class="events-section">
         <div class="section-header">
           <h2><i class="bi bi-calendar-event"></i> Eventos</h2>
-          
+
           <!-- Tab Navigation -->
           <div class="tab-navigation">
-            <button 
-              class="tab-btn"
-              [class.active]="activeTab === 'created'"
-              (click)="setActiveTab('created')"
-            >
+            <button class="tab-btn" [class.active]="activeTab === 'created'" (click)="setActiveTab('created')">
               Criados ({{ userEvents.created.length }})
             </button>
-            <button 
-              class="tab-btn"
-              [class.active]="activeTab === 'attending'"
-              (click)="setActiveTab('attending')"
-            >
+            <button class="tab-btn" [class.active]="activeTab === 'attending'" (click)="setActiveTab('attending')">
               Participando ({{ userEvents.attending.length }})
             </button>
           </div>
@@ -111,23 +96,16 @@
         <!-- Events List -->
         <div class="events-list">
           <!-- Created Events Tab -->
-          <div class="events-grid" *ngIf="activeTab === 'created'">
-            <div 
-              *ngFor="let event of userEvents.created" 
-              class="event-card"
-              (click)="navigateToEventDetails(event.eventId)"
-            >
+          <div class="events-grid events-grid--flexible" *ngIf="activeTab === 'created'">
+            <div *ngFor="let event of userEvents.created" class="event-card"
+              (click)="navigateToEventDetails(event.eventId)">
               <div class="event-image">
-                <img 
-                  [src]="event.imageUrl || 'assets/default-event.jpg'" 
-                  [alt]="event.eventName"
-                  class="event-img"
-                >
+                <img [src]="event.imageUrl || 'assets/default-event.jpg'" [alt]="event.eventName" class="event-img">
                 <div class="event-status" [class]="getEventStatusClass(event)">
                   {{ getEventStatusText(event) }}
                 </div>
               </div>
-              
+
               <div class="event-info">
                 <h3 class="event-title">{{ event.eventName }}</h3>
                 <div class="event-meta">
@@ -146,48 +124,35 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Empty State for Created Events -->
-            <div class="empty-state" *ngIf="userEvents.created.length === 0">
+            <div class="empty-state empty-state--centered" *ngIf="userEvents.created.length === 0">
               <div class="empty-icon"><i class="bi bi-calendar-plus"></i></div>
               <h3>Nenhum evento criado</h3>
-              <p>{{ isOwnProfile ? 'Você ainda não criou nenhum evento' : 'Este usuário ainda não criou nenhum evento' }}</p>
-              <button 
-                *ngIf="isOwnProfile" 
-                class="btn btn-primary"
-                routerLink="/criar-evento"
-              >
+              <p>{{ isOwnProfile ? 'Você ainda não criou nenhum evento' : 'Este usuário ainda não criou nenhum evento'
+                }}</p>
+              <button *ngIf="isOwnProfile" class="btn btn-primary" routerLink="/criar-evento">
                 <i class="bi bi-plus-lg"></i> Criar Primeiro Evento
               </button>
             </div>
           </div>
 
           <!-- Attending Events Tab -->
-          <div class="events-grid" *ngIf="activeTab === 'attending'">
-            <div 
-              *ngFor="let event of userEvents.attending" 
-              class="event-card"
-              (click)="navigateToEventDetails(event.eventId)"
-            >
+          <div class="events-grid events-grid--flexible" *ngIf="activeTab === 'attending'">
+            <div *ngFor="let event of userEvents.attending" class="event-card"
+              (click)="navigateToEventDetails(event.eventId)">
               <div class="event-image">
-                <img 
-                  [src]="event.imageUrl || 'assets/default-event.jpg'" 
-                  [alt]="event.eventName"
-                  class="event-img"
-                >
+                <img [src]="event.imageUrl || 'assets/default-event.jpg'" [alt]="event.eventName" class="event-img">
                 <div class="event-status" [class]="getEventStatusClass(event)">
                   {{ getEventStatusText(event) }}
                 </div>
               </div>
-              
+
               <div class="event-info">
                 <h3 class="event-title">{{ event.eventName }}</h3>
                 <div class="event-creator">
-                  <img 
-                    [src]="event.creatorPhotoURL || 'assets/default-avatar.png'" 
-                    [alt]="event.creatorName"
-                    class="creator-avatar"
-                  >
+                  <img [src]="event.creatorPhotoURL || 'assets/default-avatar.png'" [alt]="event.creatorName"
+                    class="creator-avatar">
                   <span>por {{ event.creatorName }}</span>
                 </div>
                 <div class="event-meta">
@@ -202,24 +167,21 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Empty State for Attending Events -->
-            <div class="empty-state" *ngIf="userEvents.attending.length === 0">
+            <div class="empty-state empty-state--centered" *ngIf="userEvents.attending.length === 0">
               <div class="empty-icon"><i class="bi bi-ticket"></i></div>
               <h3>Nenhuma participação</h3>
-              <p>{{ isOwnProfile ? 'Você ainda não está participando de nenhum evento' : 'Este usuário não está participando de nenhum evento' }}</p>
-              <button 
-                *ngIf="isOwnProfile" 
-                class="btn btn-primary"
-                routerLink="/home"
-              >
+              <p>{{ isOwnProfile ? 'Você ainda não está participando de nenhum evento' : 'Este usuário não está
+                participando de nenhum evento' }}</p>
+              <button *ngIf="isOwnProfile" class="btn btn-primary" routerLink="/home">
                 <i class="bi bi-search"></i> Explorar Eventos
               </button>
             </div>
           </div>
         </div>
       </div>
-      
+
       <!-- Action Button for Own Profile -->
       <div class="profile-actions" *ngIf="isOwnProfile">
         <button class="btn btn-outline btn-large" (click)="logout()">

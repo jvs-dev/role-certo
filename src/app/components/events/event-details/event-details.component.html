@@ -120,7 +120,7 @@
          </div>
 
          <!-- WhatsApp Group Section -->
-         <div class="whatsapp-section" *ngIf="event.whatsappLink && (isUserParticipating || isEventCreator)">
+         <div class="whatsapp-section" *ngIf="event.whatsappLink && (isUserParticipating || isEventCreator) && !isEventCreator">
             <div class="whatsapp-card">
                <div class="whatsapp-icon"><i class="bi bi-whatsapp"></i></div>
                <div class="whatsapp-content">
@@ -154,6 +154,9 @@
             <div class="creator-actions" *ngIf="isEventCreator">
                <button class="btn btn-outline" (click)="editEvent()">
                   <i class="bi bi-pencil-square"></i> Editar Evento
+               </button>
+               <button class="btn btn-danger" (click)="deleteEvent()">
+                  <i class="bi bi-trash"></i> Excluir Evento
                </button>
                <button class="btn btn-primary" (click)="openWhatsAppGroup()" *ngIf="event.whatsappLink">
                   <i class="bi bi-chat-dots"></i> Acessar Grupo

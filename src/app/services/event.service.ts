@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, addDoc, doc, getDoc, getDocs, query, 
          where, orderBy, limit, updateDoc, arrayUnion, arrayRemove, 
-         startAfter, DocumentSnapshot, Timestamp } from '@angular/fire/firestore';
+         startAfter, DocumentSnapshot, Timestamp, deleteDoc } from '@angular/fire/firestore';
 import { Observable, from, map, BehaviorSubject } from 'rxjs';
 import { Event, EventFormData } from '../models/interfaces';
 
@@ -235,54 +235,98 @@ export class EventService {
     }
   }
 
+  async deleteEvent(eventId: string): Promise<void> {
+    try {
+      const eventRef = doc(this.firestore, 'events', eventId);
+      
+      // First, get the event to find the creator
+      const eventDoc = await getDoc(eventRef);
+      if (!eventDoc.exists()) {
+        throw new Error('Event not found');
+      }
+      
+      const eventData = eventDoc.data();
+      const creatorId = eventData['creatorId'];
+      
+      // Remove event from creator's createdEvents array
+      if (creatorId) {
+        const userRef = doc(this.firestore, 'users', creatorId);
+        await updateDoc(userRef, {
+          createdEvents: arrayRemove(eventId)
+        });
+      }
+      
+      // Remove event from all participants' attendingEvents arrays
+      const participants = eventData['participants'] || [];
+      for (const participantId of participants) {
+        try {
+          const userRef = doc(this.firestore, 'users', participantId);
+          await updateDoc(userRef, {
+            attendingEvents: arrayRemove(eventId)
+          });
+        } catch (error) {
+          console.warn(`Failed to remove event from user ${participantId}:`, error);
+        }
+      }
+      
+      // Delete the event document
+      // Note: In a production app, you might want to mark as deleted instead of actually deleting
+      await deleteDoc(eventRef);
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      throw error;
+    }
+  }
+
   async getUserEvents(userId: string): Promise<{ created: Event[], attending: Event[] }> {
     try {
-      // Get created events (without orderBy to avoid index requirements)
-      const createdQuery = query(
-        this.eventsCollection,
-        where('creatorId', '==', userId)
-      );
-
-      // Get attending events (without orderBy to avoid index requirements)
-      const attendingQuery = query(
-        this.eventsCollection,
-        where('participants', 'array-contains', userId)
-      );
-
-      const [createdSnapshot, attendingSnapshot] = await Promise.all([
-        getDocs(createdQuery),
-        getDocs(attendingQuery)
-      ]);
-
-      const created: Event[] = [];
-      const attending: Event[] = [];
-
-      createdSnapshot.forEach((doc) => {
-        const data = doc.data();
-        created.push({
-          ...data,
-          eventId: doc.id,
-          eventDate: data['eventDate'].toDate()
-        } as Event);
-      });
-
-      attendingSnapshot.forEach((doc) => {
-        const data = doc.data();
-        attending.push({
-          ...data,
-          eventId: doc.id,
-          eventDate: data['eventDate'].toDate()
-        } as Event);
-      });
-
-      // Sort client-side by eventDate desc
-      created.sort((a, b) => b.eventDate.getTime() - a.eventDate.getTime());
-      attending.sort((a, b) => b.eventDate.getTime() - a.eventDate.getTime());
-
-      return { created, attending };
+      // Get user document to retrieve created and attending event IDs
+      const userDoc = await getDoc(doc(this.firestore, 'users', userId));
+      if (!userDoc.exists()) {
+        throw new Error('User not found');
+      }
+      
+      const userData = userDoc.data();
+      const createdEventIds = userData['createdEvents'] || [];
+      const attendingEventIds = userData['attendingEvents'] || [];
+      
+      // Get created events
+      const createdEvents: Event[] = [];
+      for (const eventId of createdEventIds) {
+        try {
+          const event = await this.getEvent(eventId);
+          if (event) {
+            createdEvents.push(event);
+          }
+        } catch (error) {
+          console.warn(`Failed to load created event ${eventId}:`, error);
+        }
+      }
+      
+      // Get attending events
+      const attendingEvents: Event[] = [];
+      for (const eventId of attendingEventIds) {
+        try {
+          const event = await this.getEvent(eventId);
+          if (event) {
+            attendingEvents.push(event);
+          }
+        } catch (error) {
+          console.warn(`Failed to load attending event ${eventId}:`, error);
+        }
+      }
+      
+      // Sort events by date (newest first)
+      createdEvents.sort((a, b) => b.eventDate.getTime() - a.eventDate.getTime());
+      attendingEvents.sort((a, b) => b.eventDate.getTime() - a.eventDate.getTime());
+      
+      return {
+        created: createdEvents,
+        attending: attendingEvents
+      };
     } catch (error) {
       console.error('Error getting user events:', error);
-      return { created: [], attending: [] };
+      throw error;
     }
   }
 
