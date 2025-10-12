@@ -32,9 +32,20 @@
         </ul>
 
         <div class="home-page__nav-actions">
-          <button class="home-page__nav-cart">
-            <i class="bi bi-ticket"></i>
+          <!-- Mobile-only navigation buttons -->
+          <button 
+            class="home-page__nav-mobile-btn home-page__nav-mobile-btn--calendar" 
+            routerLink="/home"
+            [class.active]="isHomeActive">
+            <i class="bi bi-calendar-week"></i>
           </button>
+          <button 
+            class="home-page__nav-mobile-btn home-page__nav-mobile-btn--geo" 
+            routerLink="/picos"
+            [class.active]="isPicosActive">
+            <i class="bi bi-geo"></i>
+          </button>
+          
           <button class="home-page__nav-profile" (click)="navigateToProfile()">
             <i class="bi bi-person"></i>
           </button>

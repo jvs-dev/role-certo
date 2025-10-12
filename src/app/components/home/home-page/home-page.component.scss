@@ -43,6 +43,7 @@
       font-weight: 700;
       color: var(--white);
       letter-spacing: 1px;
+      margin: 0px;
 
       @media (max-width: 768px) {
         font-size: var(--font-size-lg);
@@ -179,6 +180,50 @@
   &__nav-actions {
     display: flex;
     gap: var(--spacing-md);
+  }
+
+  // Mobile navigation buttons
+  &__nav-mobile-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: none; // Hidden by default, shown only on mobile
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 1.2rem;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--primary-light);
+      transform: translateY(-2px);
+    }
+
+    // Active state styling
+    &.active {
+      background: var(--primary-color);
+      border-color: var(--primary-light);
+      color: white;
+      box-shadow: 0 0 10px rgba(139, 95, 191, 0.5);
+    }
+
+    @media (max-width: 1024px) {
+      display: flex; // Show on mobile when main nav is hidden
+    }
+
+    // Specific styles for each button type
+    &--calendar {
+      // Calendar-specific styles if needed
+    }
+
+    &--geo {
+      // Geo-specific styles if needed
+    }
   }
 
   &__nav-cart,

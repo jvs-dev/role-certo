@@ -1,72 +1,130 @@
-<div class="picos-list-container">
-  <div class="header">
-    <h1>Picos</h1>
-    <div class="header-actions">
-      <a routerLink="/mapa-picos" class="btn-map-picos">
-        <i class="bi bi-map"></i> Mapa de Picos
-      </a>
-      <a routerLink="/adicionar-pico" class="btn-add-pico">
-        <i class="bi bi-plus-lg"></i> Adicionar Pico
-      </a>
-    </div>
-  </div>
+<div class="home-page">
+  <!-- Navigation Header -->
+  <header class="home-page__header">
+    <nav class="home-page__nav">
+      <div class="home-page__nav-container">
+        <div class="home-page__brand">
+          <h1 class="home-page__brand-title">Boomfest</h1>
+        </div>
 
-  <div class="filters">
-    <div class="search-box">
-      <i class="bi bi-search search-icon"></i>
-      <input type="text" placeholder="Buscar por nome..." [(ngModel)]="searchQuery" (input)="onSearch()"
-        class="search-input">
-    </div>
+        <ul class="home-page__nav-menu">
+          <li>
+            <a routerLink="/home" class="home-page__nav-link">Festas</a>
+          </li>
+          <li><a routerLink="/picos" class="home-page__nav-link home-page__nav-link--active">Picos</a></li>
+          <li class="home-page__nav-dropdown">
+            <a href="#" class="home-page__nav-link home-page__nav-dropdown-toggle" (click)="toggleMapDropdown($event)">
+              Mapa <i class="bi bi-chevron-down"></i>
+            </a>
+            <ul class="home-page__nav-dropdown-menu" [class.show]="isMapDropdownOpen">
+              <li>
+                <a routerLink="/mapa" class="home-page__nav-dropdown-item" (click)="closeMapDropdown()">
+                  <i class="bi bi-calendar-week"></i> Mapa de Eventos
+                </a>
+              </li>
+              <li>
+                <a routerLink="/mapa-picos" class="home-page__nav-dropdown-item" (click)="closeMapDropdown()">
+                  <i class="bi bi-geo"></i> Mapa de Picos
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
 
-    <div class="sort-options">
-      <button class="sort-btn" [class.active]="sortBy === 'recent'" (click)="onSortChange('recent')">
-        <i class="bi bi-clock"></i>Recentes
-      </button>
-      <button class="sort-btn" [class.active]="sortBy === 'rating'" (click)="onSortChange('rating')">
-        <i class="bi bi-star"></i>Melhores
-      </button>
-    </div>
-  </div>
-
-  <div class="loading" *ngIf="isLoading">
-    <div class="loading-spinner"></div>
-    <p>Carregando picos...</p>
-  </div>
-
-  <div class="no-picos" *ngIf="!isLoading && filteredPicos.length === 0">
-    <i class="bi bi-mountain no-picos-icon"></i>
-    <h3>Nenhum pico encontrado</h3>
-    <p>Não encontramos picos que correspondam à sua busca.</p>
-  </div>
-
-  <div class="picos-grid" *ngIf="!isLoading && filteredPicos.length > 0">
-    <div class="pico-card" *ngFor="let pico of filteredPicos">
-      <div class="pico-image">
-        <img [src]="getFirstPhoto(pico.photos)" [alt]="pico.picoName" (error)="onErrorImage($event)" class="pico-img">
-        <div class="pico-rating-badge" *ngIf="pico.ratingCount > 0">
-          <i class="bi bi-star-fill"></i>
-          <span>{{ pico.averageRating | number:'1.1-1' }}</span>
+        <div class="home-page__nav-actions">
+          <!-- Mobile-only navigation buttons -->
+          <button 
+            class="home-page__nav-mobile-btn home-page__nav-mobile-btn--calendar" 
+            routerLink="/home"
+            [class.active]="isHomeActive">
+            <i class="bi bi-calendar-week"></i>
+          </button>
+          <button 
+            class="home-page__nav-mobile-btn home-page__nav-mobile-btn--geo" 
+            routerLink="/picos"
+            [class.active]="isPicosActive">
+            <i class="bi bi-geo"></i>
+          </button>
+          
+          <button class="home-page__nav-profile" (click)="navigateToProfile()">
+            <i class="bi bi-person"></i>
+          </button>
         </div>
       </div>
-      <div class="pico-info">
-        <h3 class="pico-name">{{ pico.picoName }}</h3>
-        <div class="pico-meta">
-          <span class="pico-count">
-            <i class="bi bi-image"></i> {{ pico.photos.length }} fotos
-          </span>
-        </div>
-        <div class="pico-rating" *ngIf="pico.ratingCount > 0">
-          <span class="rating-stars">
-            <i class="bi bi-star-fill" *ngFor="let star of getStars(pico.averageRating)"></i>
-          </span>
-          <span class="rating-count">({{ pico.ratingCount }})</span>
-        </div>
-        <div class="pico-rating" *ngIf="pico.ratingCount === 0">
-          <span class="no-rating">Sem avaliações</span>
-        </div>
-        <a [routerLink]="['/picos', pico.picoId]" class="view-details-btn">
-          Ver Detalhes
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <div class="picos-list-container">
+    <div class="header">
+      <h1>Picos</h1>
+      <div class="header-actions">
+        <a routerLink="/mapa-picos" class="btn-map-picos">
+          <i class="bi bi-map"></i> Mapa de Picos
         </a>
+        <a routerLink="/adicionar-pico" class="btn-add-pico">
+          <i class="bi bi-plus-lg"></i> Adicionar Pico
+        </a>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="search-box">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" placeholder="Buscar por nome..." [(ngModel)]="searchQuery" (input)="onSearch()"
+          class="search-input">
+      </div>
+
+      <div class="sort-options">
+        <button class="sort-btn" [class.active]="sortBy === 'recent'" (click)="onSortChange('recent')">
+          <i class="bi bi-clock"></i>Recentes
+        </button>
+        <button class="sort-btn" [class.active]="sortBy === 'rating'" (click)="onSortChange('rating')">
+          <i class="bi bi-star"></i>Melhores
+        </button>
+      </div>
+    </div>
+
+    <div class="loading" *ngIf="isLoading">
+      <div class="loading-spinner"></div>
+      <p>Carregando picos...</p>
+    </div>
+
+    <div class="no-picos" *ngIf="!isLoading && filteredPicos.length === 0">
+      <i class="bi bi-mountain no-picos-icon"></i>
+      <h3>Nenhum pico encontrado</h3>
+      <p>Não encontramos picos que correspondam à sua busca.</p>
+    </div>
+
+    <div class="picos-grid" *ngIf="!isLoading && filteredPicos.length > 0">
+      <div class="pico-card" *ngFor="let pico of filteredPicos">
+        <div class="pico-image">
+          <img [src]="getFirstPhoto(pico.photos)" [alt]="pico.picoName" (error)="onErrorImage($event)" class="pico-img">
+          <div class="pico-rating-badge" *ngIf="pico.ratingCount > 0">
+            <i class="bi bi-star-fill"></i>
+            <span>{{ pico.averageRating | number:'1.1-1' }}</span>
+          </div>
+        </div>
+        <div class="pico-info">
+          <h3 class="pico-name">{{ pico.picoName }}</h3>
+          <div class="pico-meta">
+            <span class="pico-count">
+              <i class="bi bi-image"></i> {{ pico.photos.length }} fotos
+            </span>
+          </div>
+          <div class="pico-rating" *ngIf="pico.ratingCount > 0">
+            <span class="rating-stars">
+              <i class="bi bi-star-fill" *ngFor="let star of getStars(pico.averageRating)"></i>
+            </span>
+            <span class="rating-count">({{ pico.ratingCount }})</span>
+          </div>
+          <div class="pico-rating" *ngIf="pico.ratingCount === 0">
+            <span class="no-rating">Sem avaliações</span>
+          </div>
+          <a [routerLink]="['/picos', pico.picoId]" class="view-details-btn">
+            Ver Detalhes
+          </a>
+        </div>
       </div>
     </div>
   </div>

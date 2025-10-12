@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PicoService } from '../../../services/pico.service';
 import { Pico } from '../../../models/interfaces';
@@ -19,10 +19,16 @@ export class PicosListComponent implements OnInit {
   isLoading = true;
   searchQuery = '';
   sortBy: 'recent' | 'rating' = 'recent';
+  
+  // Header properties
+  isMapDropdownOpen = false;
+  isHomeActive = false;
+  isPicosActive = true;
 
   constructor(
     private picoService: PicoService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -80,5 +86,27 @@ export class PicosListComponent implements OnInit {
 
   getStars(rating: number): number[] {
     return Array(Math.floor(rating)).fill(0);
+  }
+  
+  // Header methods
+  toggleMapDropdown(event: Event): void {
+    event.preventDefault();
+    this.isMapDropdownOpen = !this.isMapDropdownOpen;
+  }
+
+  closeMapDropdown(): void {
+    this.isMapDropdownOpen = false;
+  }
+  
+  navigateToProfile(): void {
+    this.router.navigate(['/perfil/me']);
+  }
+  
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.home-page__nav-dropdown')) {
+      this.isMapDropdownOpen = false;
+    }
   }
 }
