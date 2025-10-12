@@ -6,11 +6,12 @@ import { PicoService } from '../../../services/pico.service';
 import { Pico } from '../../../models/interfaces';
 import { AuthService } from '../../../services/auth.service';
 import { HeaderComponent } from '../../shared/header/header.component';
+import { FooterComponent } from '../../shared/footer/footer.component';
 
 @Component({
   selector: 'app-picos-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, HeaderComponent],
+  imports: [CommonModule, RouterModule, FormsModule, HeaderComponent, FooterComponent],
   templateUrl: './picos-list.component.html',
   styleUrl: './picos-list.component.scss'
 })

@@ -9,10 +9,11 @@ import { ToastService } from '../../../services/toast.service';
 import { Event, User } from '../../../models/interfaces';
 import { SearchBarComponent } from '../../shared/search-bar/search-bar.component';
 import { HeaderComponent } from '../../shared/header/header.component';
+import { FooterComponent } from '../../shared/footer/footer.component';
 
 @Component({
   selector: 'app-home-page',
-  imports: [CommonModule, RouterModule, SearchBarComponent, HeaderComponent],
+  imports: [CommonModule, RouterModule, SearchBarComponent, HeaderComponent, FooterComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
 })

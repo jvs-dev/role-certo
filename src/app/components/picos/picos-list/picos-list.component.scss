@@ -3,13 +3,14 @@ body, html {
 }
 
 .picos-list-container {
-  padding: 100px 20px 20px 20px;
+  padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
   background: var(--gray-900);
   min-height: 100vh;
   color: var(--white);
-  width: 100%;  
+  width: 100%;
+  padding-top: 70px; // Add padding to account for fixed header
 }
 
 :host {
