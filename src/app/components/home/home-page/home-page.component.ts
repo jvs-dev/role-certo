@@ -23,6 +23,9 @@ export class HomePageComponent implements OnInit, OnDestroy {
   isLoadingMore = false;
   hasMoreEvents = true;
   
+  // Dropdown state
+  isMapDropdownOpen = false;
+  
   // Carousel properties
   currentSlide = 0;
   visibleSlides = 1;
@@ -130,6 +133,14 @@ export class HomePageComponent implements OnInit, OnDestroy {
     }
   }
 
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.home-page__nav-dropdown')) {
+      this.isMapDropdownOpen = false;
+    }
+  }
+
   async loadMoreEvents(): Promise<void> {
     if (this.isLoadingMore || !this.hasMoreEvents) {
       return;
@@ -185,6 +196,15 @@ export class HomePageComponent implements OnInit, OnDestroy {
   // Navigation Methods
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+  
+  toggleMapDropdown(event: MouseEvent): void {
+    event.preventDefault();
+    this.isMapDropdownOpen = !this.isMapDropdownOpen;
+  }
+
+  closeMapDropdown(): void {
+    this.isMapDropdownOpen = false;
   }
   
   navigateToProfile(): void {

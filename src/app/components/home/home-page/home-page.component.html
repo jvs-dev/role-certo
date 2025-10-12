@@ -9,12 +9,26 @@
 
         <ul class="home-page__nav-menu">
           <li>
-            <a href="#" class="home-page__nav-link home-page__nav-link--active"
-              >Festas</a
-            >
+            <a href="#" class="home-page__nav-link home-page__nav-link--active">Festas</a>
           </li>
-          <li><a routerLink="/mapa" class="home-page__nav-link">Mapa</a></li>
           <li><a routerLink="/picos" class="home-page__nav-link">Picos</a></li>
+          <li class="home-page__nav-dropdown">
+            <a href="#" class="home-page__nav-link home-page__nav-dropdown-toggle" (click)="toggleMapDropdown($event)">
+              Mapa <i class="bi bi-chevron-down"></i>
+            </a>
+            <ul class="home-page__nav-dropdown-menu" [class.show]="isMapDropdownOpen">
+              <li>
+                <a routerLink="/mapa" class="home-page__nav-dropdown-item" (click)="closeMapDropdown()">
+                  <i class="bi bi-calendar-week"></i> Mapa de Eventos
+                </a>
+              </li>
+              <li>
+                <a routerLink="/mapa-picos" class="home-page__nav-dropdown-item" (click)="closeMapDropdown()">
+                  <i class="bi bi-geo"></i> Mapa de Picos
+                </a>
+              </li>
+            </ul>
+          </li>
         </ul>
 
         <div class="home-page__nav-actions">
@@ -49,10 +63,7 @@
     <div class="home-page__container">
       <div class="home-page__search-wrapper">
         <div class="home-page__search-input">
-          <app-search-bar
-            (searchChange)="onSearch($event)"
-            (clearSearch)="onClearSearch()"
-          >
+          <app-search-bar (searchChange)="onSearch($event)" (clearSearch)="onClearSearch()">
           </app-search-bar>
         </div>
 
@@ -70,11 +81,7 @@
             <option value="popular">Popular</option>
           </select>
 
-          <button
-            class="home-page__map-btn"
-            routerLink="/mapa"
-            title="Ver eventos no mapa"
-          >
+          <button class="home-page__map-btn" routerLink="/mapa" title="Ver eventos no mapa">
             <i class="bi bi-map"></i>
             Mapa
           </button>
@@ -91,27 +98,21 @@
       <div class="home-page__carousel-wrapper">
         <!-- Removendo botões de navegação e substituindo por carrossel arrastável -->
         <div class="home-page__carousel home-page__carousel--snap">
-          <div
-            class="home-page__carousel-slide"
-            *ngFor="let event of events; let i = index"
-          >
+          <div class="home-page__carousel-slide" *ngFor="let event of events; let i = index">
             <div class="home-page__event-card">
               <div class="home-page__event-image">
-                <img
-                  [src]="event.imageUrl || 'assets/default-event.jpg'"
-                  [alt]="event.eventName"
-                  class="home-page__event-img"
-                />
+                <img [src]="event.imageUrl || 'assets/default-event.jpg'" [alt]="event.eventName"
+                  class="home-page__event-img" />
                 <div class="home-page__event-date">
                   <span class="home-page__event-day">{{
                     getEventDay(event.eventDate)
-                  }}</span>
+                    }}</span>
                   <span class="home-page__event-month">{{
                     getEventMonth(event.eventDate)
-                  }}</span>
+                    }}</span>
                   <span class="home-page__event-year">{{
                     getEventYear(event.eventDate)
-                  }}</span>
+                    }}</span>
                 </div>
               </div>
 
@@ -125,16 +126,10 @@
                 </div>
 
                 <div class="home-page__event-actions">
-                  <button
-                    class="home-page__btn home-page__btn--primary"
-                    (click)="buyTicket(event.eventId)"
-                  >
+                  <button class="home-page__btn home-page__btn--primary" (click)="buyTicket(event.eventId)">
                     Buy Ticket
                   </button>
-                  <button
-                    class="home-page__btn home-page__btn--secondary"
-                    (click)="viewEventDetails(event.eventId)"
-                  >
+                  <button class="home-page__btn home-page__btn--secondary" (click)="viewEventDetails(event.eventId)">
                     More Info
                   </button>
                 </div>
@@ -155,9 +150,7 @@
             <div class="home-page__skeleton-image"></div>
             <div class="home-page__skeleton-content">
               <div class="home-page__skeleton-line"></div>
-              <div
-                class="home-page__skeleton-line home-page__skeleton-line--short"
-              ></div>
+              <div class="home-page__skeleton-line home-page__skeleton-line--short"></div>
               <div class="home-page__skeleton-buttons"></div>
             </div>
           </div>
@@ -175,23 +168,19 @@
         </div>
         <h3 class="home-page__empty-title">
           {{
-            isSearching
-              ? "Nenhum evento encontrado"
-              : "Nenhum evento disponível"
+          isSearching
+          ? "Nenhum evento encontrado"
+          : "Nenhum evento disponível"
           }}
         </h3>
         <p class="home-page__empty-message">
           {{
-            isSearching
-              ? "Tente buscar com termos diferentes ou explore eventos em outras regiões."
-              : "Seja o primeiro a criar um evento incrível na sua região!"
+          isSearching
+          ? "Tente buscar com termos diferentes ou explore eventos em outras regiões."
+          : "Seja o primeiro a criar um evento incrível na sua região!"
           }}
         </p>
-        <a
-          *ngIf="!isSearching"
-          class="home-page__btn home-page__btn--primary"
-          routerLink="/criar-evento"
-        >
+        <a *ngIf="!isSearching" class="home-page__btn home-page__btn--primary" routerLink="/criar-evento">
           Criar Primeiro Evento
         </a>
       </div>
@@ -232,18 +221,10 @@
 
   <!-- Floating Action Buttons (Mobile) -->
   <div class="home-page__fab">
-    <button
-      class="home-page__fab-btn home-page__fab-btn--secondary"
-      routerLink="/mapa"
-      title="Ver Mapa"
-    >
+    <button class="home-page__fab-btn home-page__fab-btn--secondary" routerLink="/mapa" title="Ver Mapa">
       <i class="bi bi-map"></i>
     </button>
-    <button
-      class="home-page__fab-btn"
-      routerLink="/criar-evento"
-      title="Criar Evento"
-    >
+    <button class="home-page__fab-btn" routerLink="/criar-evento" title="Criar Evento">
       <i class="bi bi-plus-lg"></i>
     </button>
   </div>
