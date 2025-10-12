@@ -68,3 +68,48 @@ export interface UserProfile {
   };
   photoURL?: string; // Changed from photoFile to photoURL for consistency
 }
+
+export interface Pico {
+  picoId: string;
+  picoName: string;
+  description: string;
+  location: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+  creatorId: string;
+  creatorName: string;
+  photos: string[]; // Array of image URLs
+  averageRating: number;
+  ratingCount: number;
+  createdAt?: any; // Firebase Timestamp (optional for compatibility)
+}
+
+export interface PicoFormData {
+  picoName: string;
+  description: string;
+  location: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  } | null;
+  photos: string[]; // Array of image URLs
+}
+
+export interface Review {
+  reviewId: string;
+  userId: string;
+  userName: string;
+  userPhotoURL: string;
+  rating: number; // 1 to 5
+  comment: string;
+  createdAt: any; // Firebase Timestamp
+  media: string[]; // Array of media URLs (photos/videos)
+}
+
+export interface ReviewFormData {
+  rating: number; // 1 to 5
+  comment: string;
+  media: string[]; // Array of media URLs
+}

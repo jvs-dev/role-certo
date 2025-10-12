@@ -47,6 +47,26 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'picos',
+    loadComponent: () => import('./components/picos/picos-list/picos-list.component').then(m => m.PicosListComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'picos/:id',
+    loadComponent: () => import('./components/picos/pico-details/pico-details.component').then(m => m.PicoDetailsComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'adicionar-pico',
+    loadComponent: () => import('./components/picos/add-pico/add-pico.component').then(m => m.AddPicoComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'picos/:id/editar',
+    loadComponent: () => import('./components/picos/add-pico/add-pico.component').then(m => m.AddPicoComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: '**',
     redirectTo: '/home'
   }

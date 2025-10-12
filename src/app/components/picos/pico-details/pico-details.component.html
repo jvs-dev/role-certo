@@ -1,0 +1,305 @@
+<!-- Pico Details Page -->
+<div class="pico-details-page" *ngIf="!isLoading && pico">
+
+   <!-- Header with Background Image -->
+   <div class="pico-header" [style.background-image]="getFirstPhoto(pico.photos) ? 'url(' + getFirstPhoto(pico.photos) + ')' : 'none'">
+      <div class="pico-header__overlay"></div>
+      <div class="pico-header__content">
+
+         <!-- Navigation -->
+         <div class="pico-nav">
+            <button class="nav-back" (click)="navigateToPicos()">
+               <span class="nav-icon"><i class="bi bi-arrow-left"></i></span>
+               <span class="nav-text">Voltar</span>
+            </button>
+
+            <div class="nav-actions">
+               <button class="nav-action" (click)="sharePico()" title="Compartilhar">
+                  <span class="action-icon"><i class="bi bi-share"></i></span>
+               </button>
+            </div>
+         </div>
+
+         <!-- Pico Title -->
+         <div class="pico-hero">
+            <h1 class="pico-title">{{ pico.picoName }}</h1>
+            <div class="pico-creator">
+              <span>Criado por <strong>{{ pico.creatorName }}</strong></span>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Pico Content -->
+   <div class="pico-content">
+      <div class="container">
+
+         <!-- Main Info Cards -->
+         <div class="info-grid">
+
+            <!-- Rating Card -->
+            <div class="info-card">
+               <div class="card-icon"><i class="bi bi-star-fill"></i></div>
+               <div class="card-content">
+                  <h3>Avaliação</h3>
+                  <p class="primary-text" *ngIf="pico.ratingCount > 0">{{ pico.averageRating | number:'1.1-1' }}</p>
+                  <p class="primary-text" *ngIf="pico.ratingCount === 0">Sem avaliações</p>
+                  <p class="secondary-text">{{ pico.ratingCount }} avaliações</p>
+               </div>
+            </div>
+
+            <!-- Location Card -->
+            <div class="info-card">
+               <div class="card-icon"><i class="bi bi-geo-alt-fill"></i></div>
+               <div class="card-content">
+                  <h3>Localização</h3>
+                  <p class="primary-text">{{ pico.location }}</p>
+                  <p class="secondary-text">Coordenadas: {{ pico.coordinates.lat | number:'1.4-4' }}, {{ pico.coordinates.lng | number:'1.4-4' }}</p>
+               </div>
+            </div>            
+            
+         </div>
+
+         <!-- Image Gallery Section -->
+         <div class="gallery-section" *ngIf="pico.photos && pico.photos.length > 0">
+            <div class="section-header">
+               <h2><i class="bi bi-images"></i> Fotos do Pico</h2>
+            </div>
+
+            <!-- Image Carousel -->
+            <div class="image-carousel">
+               <div class="carousel-container">
+                  <img 
+                    [src]="pico.photos[currentImageIndex]" 
+                    [alt]="pico.picoName"
+                    (error)="onErrorImage($event)"
+                    class="carousel-image">
+                  
+                  <button 
+                    class="carousel-btn prev-btn" 
+                    (click)="prevImage()" 
+                    *ngIf="pico.photos.length > 1">
+                    <i class="bi bi-caret-left"></i>
+                  </button>
+                  
+                  <button 
+                    class="carousel-btn next-btn" 
+                    (click)="nextImage()" 
+                    *ngIf="pico.photos.length > 1">
+                    <i class="bi bi-caret-right"></i>
+                  </button>
+                  
+                  <div class="image-indicators" *ngIf="pico.photos.length > 1">
+                    <span 
+                      *ngFor="let photo of pico.photos; let i = index"
+                      [class.active]="i === currentImageIndex"
+                      class="indicator"
+                      (click)="currentImageIndex = i">
+                    </span>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <!-- Pico Description -->
+         <div class="description-section">
+            <h2><i class="bi bi-file-text"></i> Descrição</h2>
+            <div class="description-content">
+               <p>{{ pico.description }}</p>
+            </div>
+         </div>
+
+         <!-- Map Section -->
+         <div class="map-section">
+            <div class="section-header">
+               <h2><i class="bi bi-map"></i> Localização no Mapa</h2>
+            </div>
+            <div id="pico-map" class="map"></div>
+         </div>
+
+         <!-- Reviews Section -->
+         <div class="reviews-section">
+            <div class="section-header">
+               <h2><i class="bi bi-chat-square-text"></i> Avaliações ({{ reviews.length }})</h2>
+            </div>
+
+            <!-- Review Form (only if user hasn't reviewed yet) -->
+            <div class="review-form-section" *ngIf="!currentUserReview && isUserAuthenticated()">
+               <div class="review-card user-review-card">
+                  <h3>Avaliar este Pico</h3>
+                  
+                  <form (ngSubmit)="submitReview()" class="review-form">
+                     <div class="form-group">
+                        <label>Avaliação: *</label>
+                        <div class="rating-input">
+                           <span 
+                              *ngFor="let star of [1,2,3,4,5]; let i = index"
+                              class="star"
+                              [class.filled]="i < reviewForm.rating"
+                              (click)="reviewForm.rating = i + 1">
+                              ★
+                           </span>
+                        </div>
+                     </div>
+                     
+                     <div class="form-group">
+                        <label for="comment">Comentário: *</label>
+                        <textarea 
+                           id="comment"
+                           [(ngModel)]="reviewForm.comment"
+                           name="comment"
+                           rows="3"
+                           placeholder="Compartilhe sua experiência..."
+                           required>
+                        </textarea>
+                        <div class="field-hint">Descreva sua experiência no pico (obrigatório)</div>
+                     </div>
+                     
+                     <div class="form-group">
+                        <label>Mídias (URLs de fotos/vídeos):</label>
+                        <div class="media-inputs">
+                           <div class="media-input-row" *ngFor="let media of reviewForm.media; let i = index">
+                              <input 
+                                type="text" 
+                                [(ngModel)]="reviewForm.media[i]"
+                                [name]="'media' + i"
+                                placeholder="Cole a URL de uma foto ou vídeo"
+                                [class.error]="media.trim() !== '' && !isUrlValid(media)">
+                              <button 
+                                type="button" 
+                                class="remove-btn"
+                                (click)="removeMediaField(i)"
+                                *ngIf="reviewForm.media.length > 1">
+                                <i class="bi bi-x"></i>
+                              </button>
+                           </div>
+                           
+                           <button 
+                              type="button" 
+                              class="add-media-btn"
+                              (click)="addMediaField()">
+                              <i class="bi bi-plus"></i> Adicionar mais uma mídia
+                           </button>
+                        </div>
+                        <div class="field-hint">Adicione fotos ou vídeos para ilustrar sua experiência (opcional)</div>
+                     </div>
+                     
+                     <div class="form-error" *ngIf="submitError">
+                        {{ submitError }}
+                     </div>
+                     
+                     <button 
+                        type="submit" 
+                        class="btn btn-primary"
+                        [disabled]="isSubmitting || reviewForm.rating === 0 || !reviewForm.comment.trim() || hasInvalidUrls()">
+                        <span *ngIf="!isSubmitting"><i class="bi bi-send"></i> Enviar Avaliação</span>
+                        <span *ngIf="isSubmitting"><i class="bi bi-hourglass-split"></i> Enviando...</span>
+                     </button>
+                  </form>
+               </div>
+            </div>
+
+            <!-- User's Review (if they've already reviewed) -->
+            <div class="user-review" *ngIf="currentUserReview">
+               <h3>Sua Avaliação</h3>
+               <div class="review-card user-review-card">
+                  <div class="review-header">
+                     <div class="reviewer-info">
+                        <img 
+                           [src]="currentUserReview.userPhotoURL" 
+                           [alt]="currentUserReview.userName"
+                           class="reviewer-avatar"
+                           (error)="onErrorImage($event)">
+                        <div>
+                           <div class="reviewer-name">{{ currentUserReview.userName }}</div>
+                           <div class="review-date">{{ currentUserReview.createdAt.toDate() | date:'dd/MM/yyyy' }}</div>
+                        </div>
+                     </div>
+                     <div class="review-rating">
+                        <span class="rating-stars">
+                           <i class="bi bi-star-fill" *ngFor="let star of getStars(currentUserReview.rating)"></i>
+                        </span>
+                     </div>
+                  </div>
+                  
+                  <div class="review-comment" *ngIf="currentUserReview.comment">
+                     <p>{{ currentUserReview.comment }}</p>
+                  </div>
+                  
+                  <div class="review-media" *ngIf="currentUserReview.media && currentUserReview.media.length > 0">
+                     <div class="media-grid">
+                        <div class="media-item" *ngFor="let mediaUrl of currentUserReview.media">
+                           <img 
+                              [src]="mediaUrl" 
+                              [alt]="'Mídia do usuário'"
+                              (error)="onErrorImage($event)"
+                              class="media-image">
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <!-- All Reviews -->
+            <div class="all-reviews" *ngIf="reviews && reviews.length > 0">
+               <div class="reviews-list">
+                  <div class="review-card" *ngFor="let review of reviews">
+                     <div class="review-header">
+                        <div class="reviewer-info">
+                           <img 
+                              [src]="review.userPhotoURL" 
+                              [alt]="review.userName"
+                              class="reviewer-avatar"
+                              (error)="onErrorImage($event)">
+                           <div>
+                              <div class="reviewer-name">{{ review.userName }}</div>
+                              <div class="review-date">{{ review.createdAt.toDate() | date:'dd/MM/yyyy' }}</div>
+                           </div>
+                        </div>
+                        <div class="review-rating">
+                           <span class="rating-stars">
+                              <i class="bi bi-star-fill" *ngFor="let star of getStars(review.rating)"></i>
+                           </span>
+                        </div>
+                     </div>
+                     
+                     <div class="review-comment" *ngIf="review.comment">
+                        <p>{{ review.comment }}</p>
+                     </div>
+                     
+                     <div class="review-media" *ngIf="review.media && review.media.length > 0">
+                        <div class="media-grid">
+                           <div class="media-item" *ngFor="let mediaUrl of review.media">
+                              <img 
+                                [src]="mediaUrl" 
+                                [alt]="'Mídia do usuário'"
+                                (error)="onErrorImage($event)"
+                                class="media-image">
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="isLoading">
+   <div class="loading-spinner"></div>
+   <p>Carregando detalhes do pico...</p>
+</div>
+
+<!-- Error State -->
+<div class="error-container" *ngIf="!isLoading && !pico">
+   <div class="error-content">
+      <span class="error-icon"><i class="bi bi-emoji-frown"></i></span>
+      <h2>Pico não encontrado</h2>
+      <p>O pico que você está procurando pode ter sido removido ou não existe.</p>
+      <button class="btn btn-primary" (click)="navigateToPicos()">
+         <i class="bi bi-arrow-left"></i> Voltar para Picos
+      </button>
+   </div>
+</div>

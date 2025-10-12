@@ -1,0 +1,68 @@
+<div class="picos-list-container">
+  <div class="header">
+    <h1>Picos</h1>
+    <a routerLink="/adicionar-pico" class="btn-add-pico">
+      <i class="bi bi-plus-lg"></i> Adicionar Pico
+    </a>
+  </div>
+
+  <div class="filters">
+    <div class="search-box">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" placeholder="Buscar por nome..." [(ngModel)]="searchQuery" (input)="onSearch()"
+        class="search-input">
+    </div>
+
+    <div class="sort-options">
+      <button class="sort-btn" [class.active]="sortBy === 'recent'" (click)="onSortChange('recent')">
+        <i class="bi bi-clock"></i>Recentes
+      </button>
+      <button class="sort-btn" [class.active]="sortBy === 'rating'" (click)="onSortChange('rating')">
+        <i class="bi bi-star"></i>Melhores
+      </button>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Carregando picos...</p>
+  </div>
+
+  <div class="no-picos" *ngIf="!isLoading && filteredPicos.length === 0">
+    <i class="bi bi-mountain no-picos-icon"></i>
+    <h3>Nenhum pico encontrado</h3>
+    <p>Não encontramos picos que correspondam à sua busca.</p>
+  </div>
+
+  <div class="picos-grid" *ngIf="!isLoading && filteredPicos.length > 0">
+    <div class="pico-card" *ngFor="let pico of filteredPicos">
+      <div class="pico-image">
+        <img [src]="getFirstPhoto(pico.photos)" [alt]="pico.picoName" (error)="onErrorImage($event)" class="pico-img">
+        <div class="pico-rating-badge" *ngIf="pico.ratingCount > 0">
+          <i class="bi bi-star-fill"></i>
+          <span>{{ pico.averageRating | number:'1.1-1' }}</span>
+        </div>
+      </div>
+      <div class="pico-info">
+        <h3 class="pico-name">{{ pico.picoName }}</h3>
+        <div class="pico-meta">
+          <span class="pico-count">
+            <i class="bi bi-image"></i> {{ pico.photos.length }} fotos
+          </span>
+        </div>
+        <div class="pico-rating" *ngIf="pico.ratingCount > 0">
+          <span class="rating-stars">
+            <i class="bi bi-star-fill" *ngFor="let star of getStars(pico.averageRating)"></i>
+          </span>
+          <span class="rating-count">({{ pico.ratingCount }})</span>
+        </div>
+        <div class="pico-rating" *ngIf="pico.ratingCount === 0">
+          <span class="no-rating">Sem avaliações</span>
+        </div>
+        <a [routerLink]="['/picos', pico.picoId]" class="view-details-btn">
+          Ver Detalhes
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

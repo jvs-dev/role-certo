@@ -1,0 +1,227 @@
+<!--
+  Página de Criação/Edição de Picos
+  Design multi-step responsivo com tema roxo
+-->
+<div class="page-container">
+  <div class="form-card">
+    <!-- Cabeçalho com o título da página e navegação -->
+    <div class="card-header">
+      <h1 class="header-title">{{ isEditMode ? 'Editar Pico' : 'Adicionar Novo Pico' }}</h1>
+      <a class="header-link" routerLink="/home">Voltar para Home</a>
+    </div>
+
+    <!-- Indicador de Progresso (Stepper) -->
+    <div class="stepper">
+      <div class="step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+        <div class="step-icon">
+          <span *ngIf="currentStep <= 1">1</span>
+          <span *ngIf="currentStep > 1" class="check-icon"><i class="bi bi-check"></i></span>
+        </div>
+        <div class="step-label">Fotos</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
+        <div class="step-icon">
+          <span *ngIf="currentStep <= 2">2</span>
+          <span *ngIf="currentStep > 2" class="check-icon"><i class="bi bi-check"></i></span>
+        </div>
+        <div class="step-label">Informações</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" [class.active]="currentStep === 3">
+        <div class="step-icon">3</div>
+        <div class="step-label">Localização</div>
+      </div>
+    </div>
+
+    <!-- Formulário Principal -->
+    <form (ngSubmit)="submitForm()" class="pico-form">
+      
+      <!-- Passo 1: Fotos -->
+      <div class="form-step-content" *ngIf="currentStep === 1">
+        <h2 class="step-title">Fotos do Pico</h2>
+        <p class="step-subtitle">Adicione pelo menos duas fotos do pico através de URLs.</p>
+
+        <div class="form-grid">
+          <div class="form-group span-2">
+            <label>Fotos *</label>
+            <div class="photo-inputs">
+              <div class="photo-input-row" *ngFor="let photo of picoForm.photos; let i = index">
+                <input 
+                  type="text" 
+                  [(ngModel)]="picoForm.photos[i]"
+                  [name]="'photo' + i"
+                  placeholder="Cole a URL de uma foto"
+                  [class.error]="photo.trim() !== '' && !isUrlValid(photo)"
+                  (input)="onPhotoUrlChange(i)">
+                <button 
+                  type="button" 
+                  class="remove-btn"
+                  (click)="removePhotoField(i)"
+                  *ngIf="picoForm.photos.length > 2">
+                  Remover
+                </button>
+              </div>
+              
+              <button 
+                type="button" 
+                class="add-photo-btn"
+                (click)="addPhotoField()">
+                + Adicionar mais uma foto
+              </button>
+            </div>
+            
+            <!-- Image Preview -->
+            <div class="image-preview-container" *ngIf="imagePreviews.length > 0">
+              <div class="image-preview-grid">
+                <div class="image-preview-item" *ngFor="let preview of imagePreviews; let i = index">
+                  <div class="image-preview">
+                    <img [src]="preview" alt="Preview {{i+1}}" (error)="onErrorImage($event)">
+                    <div class="preview-index">{{i+1}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="validation-message" *ngIf="!hasValidPhotos() && hasNonEmptyPhotos()">
+              <p *ngIf="getNonEmptyPhotosCount() < 2">
+                Você precisa de pelo menos duas fotos.
+              </p>
+              <p *ngIf="hasInvalidUrlsInForm()">
+                Algumas URLs não são válidas. Certifique-se de que começam com http:// ou https://
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passo 2: Informações -->
+      <div class="form-step-content" *ngIf="currentStep === 2">
+        <h2 class="step-title">Informações do Pico</h2>
+        <p class="step-subtitle">Preencha as informações básicas sobre o pico.</p>
+        
+        <div class="form-grid">
+          <!-- Nome do Pico -->
+          <div class="form-group span-2">
+            <label for="picoName">Nome do Pico *</label>
+            <input 
+              id="picoName"
+              type="text" 
+              [(ngModel)]="picoForm.picoName"
+              name="picoName"
+              placeholder="Ex: Pico do Papagaio"
+              [class.error]="!picoForm.picoName.trim() && submitError"
+              required>
+            <span class="error-message" *ngIf="!picoForm.picoName.trim() && submitError">Por favor, insira o nome do pico.</span>
+          </div>
+
+          <!-- Descrição -->
+          <div class="form-group span-2">
+            <label for="description">Descrição *</label>
+            <textarea 
+              id="description"
+              [(ngModel)]="picoForm.description"
+              name="description"
+              rows="4"
+              placeholder="Descreva o pico, suas características, dificuldade, etc."
+              [class.error]="!picoForm.description.trim() && submitError"
+              required>
+            </textarea>
+            <span class="error-message" *ngIf="!picoForm.description.trim() && submitError">Por favor, insira a descrição do pico.</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Passo 3: Localização -->
+      <div class="form-step-content" *ngIf="currentStep === 3">
+        <h2 class="step-title">Localização do Pico</h2>
+        <p class="step-subtitle">Informe o endereço e selecione a localização exata no mapa.</p>
+        
+        <div class="form-grid">
+          <!-- Endereço -->
+          <div class="form-group span-2">
+            <label for="location">Endereço Completo *</label>
+            <div class="address-input-wrapper">
+              <input 
+                id="location"
+                type="text" 
+                [(ngModel)]="picoForm.location"
+                name="location"
+                placeholder="Ex: Rua das Palmeiras, 123, Salvador, BA"
+                [class.error]="!picoForm.location.trim() && submitError"
+                required>
+              <button 
+                type="button" 
+                class="btn-verify-location"
+                (click)="geocodeAddress()"
+                [disabled]="isGeocoding"
+                title="Verificar Localização"
+              >
+                <i class="bi bi-geo-alt" *ngIf="!isGeocoding"></i>
+                <i class="bi bi-hourglass-split" *ngIf="isGeocoding"></i>
+                {{ isGeocoding ? 'Buscando...' : 'Buscar' }}
+              </button>
+            </div>
+            <span class="error-message" *ngIf="!picoForm.location.trim() && submitError">Por favor, insira a localização do pico.</span>
+            <div class="geocoding-results" *ngIf="geocodingResults.length > 0">
+              <div class="result-item" 
+                   *ngFor="let result of geocodingResults"
+                   (click)="selectGeocodingResult(result)">
+                {{ result.display_name }}
+              </div>
+            </div>
+            <div class="error-message" *ngIf="geocodingError">
+              {{ geocodingError }}
+            </div>
+          </div>
+
+          <!-- Mapa -->
+          <div class="form-group span-2">
+            <label>Selecione no mapa *</label>
+            <div id="add-pico-map" class="map"></div>
+            <small class="field-hint">Clique no mapa para selecionar a localização exata do pico.</small>
+            <div class="coordinates-display" *ngIf="picoForm.coordinates">
+              Coordenadas: {{ picoForm.coordinates.lat | number:'1.4-4' }}, {{ picoForm.coordinates.lng | number:'1.4-4' }}
+            </div>
+            <span class="error-message" *ngIf="!picoForm.coordinates && submitError">Por favor, selecione a localização no mapa.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botões de Navegação do Formulário -->
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          *ngIf="currentStep > 1" 
+          (click)="prevStep()"
+          [disabled]="isSubmitting"
+        >
+          <i class="bi bi-arrow-left"></i> Anterior
+        </button>
+        
+        <div class="spacer"></div>
+        
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          *ngIf="currentStep < 3" 
+          (click)="nextStep()"
+          [disabled]="isSubmitting || (currentStep === 1 && !hasValidPhotos())"
+        >
+          Próximo <i class="bi bi-arrow-right"></i>
+        </button>
+        
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-create" 
+          *ngIf="currentStep === 3" 
+          [disabled]="isSubmitting"
+        >
+          <span *ngIf="!isSubmitting"><i class="bi bi-plus-lg"></i> {{ isEditMode ? 'Atualizar Pico' : 'Adicionar Pico' }}</span>
+          <span *ngIf="isSubmitting"><i class="bi bi-hourglass-split"></i> Processando...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
