@@ -47,6 +47,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'mapa-picos',
+    loadComponent: () => import('./components/picos/picos-map/picos-map.component').then(m => m.PicosMapComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'picos',
     loadComponent: () => import('./components/picos/picos-list/picos-list.component').then(m => m.PicosListComponent),
     canActivate: [AuthGuard]
