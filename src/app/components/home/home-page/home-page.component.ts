@@ -1,17 +1,18 @@
 import { Component, OnInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterModule, Router, NavigationEnd } from '@angular/router';
-import { Subject, takeUntil, filter } from 'rxjs';
+import { RouterModule, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { EventService } from '../../../services/event.service';
 import { AuthService } from '../../../services/auth.service';
 import { LoadingService } from '../../../services/loading.service';
 import { ToastService } from '../../../services/toast.service';
 import { Event, User } from '../../../models/interfaces';
 import { SearchBarComponent } from '../../shared/search-bar/search-bar.component';
+import { HeaderComponent } from '../../shared/header/header.component';
 
 @Component({
   selector: 'app-home-page',
-  imports: [CommonModule, RouterModule, SearchBarComponent],
+  imports: [CommonModule, RouterModule, SearchBarComponent, HeaderComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
 })
@@ -22,13 +23,6 @@ export class HomePageComponent implements OnInit, OnDestroy {
   isSearching = false;
   isLoadingMore = false;
   hasMoreEvents = true;
-  
-  // Dropdown state
-  isMapDropdownOpen = false;
-  
-  // Mobile navigation active state
-  isHomeActive = true;
-  isPicosActive = false;
   
   // Carousel properties
   currentSlide = 0;
@@ -65,34 +59,11 @@ export class HomePageComponent implements OnInit, OnDestroy {
       .subscribe(loading => {
         this.isLoading = loading;
       });
-      
-    // Subscribe to router events to update active state
-    this.router.events
-      .pipe(
-        filter(event => event instanceof NavigationEnd),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((event: NavigationEnd) => {
-        this.updateActiveState(event.url);
-      });
-      
-    // Initialize active state based on current route
-    if (this.isBrowser) {
-      this.updateActiveState(this.router.url);
-    }
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-  
-  // Update active state based on current route
-  private updateActiveState(url: string): void {
-    // Home is active for home page or root path
-    this.isHomeActive = url === '/home' || url === '/';
-    // Picos is active for any picos-related routes
-    this.isPicosActive = url.startsWith('/picos') && !url.startsWith('/picos/mapa');
   }
 
   async loadInitialEvents(): Promise<void> {
@@ -160,14 +131,6 @@ export class HomePageComponent implements OnInit, OnDestroy {
     }
   }
 
-  @HostListener('document:click', ['$event'])
-  onClickOutside(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.home-page__nav-dropdown')) {
-      this.isMapDropdownOpen = false;
-    }
-  }
-
   async loadMoreEvents(): Promise<void> {
     if (this.isLoadingMore || !this.hasMoreEvents) {
       return;
@@ -223,15 +186,6 @@ export class HomePageComponent implements OnInit, OnDestroy {
   // Navigation Methods
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
-  }
-  
-  toggleMapDropdown(event: MouseEvent): void {
-    event.preventDefault();
-    this.isMapDropdownOpen = !this.isMapDropdownOpen;
-  }
-
-  closeMapDropdown(): void {
-    this.isMapDropdownOpen = false;
   }
   
   navigateToProfile(): void {

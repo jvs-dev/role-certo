@@ -1,0 +1,54 @@
+<!-- Navigation Header -->
+<header class="home-page__header">
+  <nav class="home-page__nav">
+    <div class="home-page__nav-container">
+      <div class="home-page__brand">
+        <h1 class="home-page__brand-title">Boomfest</h1>
+      </div>
+
+      <ul class="home-page__nav-menu">
+        <li>
+          <a routerLink="/home" class="home-page__nav-link" [class.home-page__nav-link--active]="isHomeActive">Festas</a>
+        </li>
+        <li><a routerLink="/picos" class="home-page__nav-link" [class.home-page__nav-link--active]="isPicosActive">Picos</a></li>
+        <li class="home-page__nav-dropdown">
+          <a href="#" class="home-page__nav-link home-page__nav-dropdown-toggle" (click)="toggleMapDropdown($event)">
+            Mapa <i class="bi bi-chevron-down"></i>
+          </a>
+          <ul class="home-page__nav-dropdown-menu" [class.show]="isMapDropdownOpen">
+            <li>
+              <a routerLink="/mapa" class="home-page__nav-dropdown-item" (click)="closeMapDropdown()">
+                <i class="bi bi-calendar-week"></i> Mapa de Eventos
+              </a>
+            </li>
+            <li>
+              <a routerLink="/mapa-picos" class="home-page__nav-dropdown-item" (click)="closeMapDropdown()">
+                <i class="bi bi-geo"></i> Mapa de Picos
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="home-page__nav-actions">
+        <!-- Mobile-only navigation buttons -->
+        <button 
+          class="home-page__nav-mobile-btn home-page__nav-mobile-btn--calendar" 
+          routerLink="/home"
+          [class.active]="isHomeActive">
+          <i class="bi bi-calendar-week"></i>
+        </button>
+        <button 
+          class="home-page__nav-mobile-btn home-page__nav-mobile-btn--geo" 
+          routerLink="/picos"
+          [class.active]="isPicosActive">
+          <i class="bi bi-geo"></i>
+        </button>
+        
+        <button class="home-page__nav-profile" (click)="navigateToProfile()">
+          <i class="bi bi-person"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+</header>

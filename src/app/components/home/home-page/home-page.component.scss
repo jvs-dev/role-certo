@@ -1105,3 +1105,84 @@
     opacity: 0.5;
   }
 }
+
+// Add the header styles for the search section
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  @media (max-width: 1024px) {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--white);
+    margin: 0;
+    background: linear-gradient(45deg, var(--white), var(--primary-light));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    @media (max-width: 1024px) {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  // Hide header actions on mobile screens where floating buttons are visible
+  .header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+
+    @media (max-width: 1024px) {
+      display: none;
+    }
+  }
+}
+
+.btn-map-picos {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--white);
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    border-color: var(--primary-light);
+  }
+}
+
+.btn-add-pico {
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--primary-light);
+
+  &:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 95, 191, 0.3);
+  }
+}
