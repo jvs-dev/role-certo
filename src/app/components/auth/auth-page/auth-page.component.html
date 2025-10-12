@@ -9,7 +9,7 @@
 
             <div class="auth-page__profile">
                <div class="auth-page__profile-avatar">
-                  <img src="assets/default-avatar.png" alt="Profile" class="auth-page__profile-image">
+                  <img src="./boomba-logo.png" alt="Profile" class="auth-page__profile-image">
                </div>
                <div class="auth-page__profile-info">
                   <h3 class="auth-page__profile-name">Bomfest</h3>
@@ -28,7 +28,7 @@
                </button>
                <button class="auth-page__toggle-btn" [class.auth-page__toggle-btn--active]="isLoginMode"
                   (click)="isLoginMode = true">
-                  Join Us
+                  Login
                </button>
             </div>
          </div>
@@ -36,10 +36,10 @@
          <div class="auth-page__form-content">
             <div class="auth-page__welcome">
                <h1 class="auth-page__welcome-title">
-                  {{ isLoginMode ? 'Welcome to Bomfest' : 'Create Account' }}
+                  {{ isLoginMode ? 'Bem-vindo ao Bomfest' : 'Create Account' }}
                </h1>
                <p class="auth-page__welcome-subtitle">
-                  {{ isLoginMode ? 'Welcome to Bomfest' : 'Join Bomfest community' }}
+                  {{ isLoginMode ? 'Hoje é aonde?' : 'Junte-se à comunidade Bomfest' }}
                </p>
             </div>
 
@@ -50,9 +50,9 @@
 
             <div class="auth-page__footer">
                <p class="auth-page__footer-text">
-                  {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
+                  {{ isLoginMode ? "Não tem uma conta?" : "Já tem uma conta?" }}
                   <a href="#" (click)="toggleMode(); $event.preventDefault()" class="auth-page__footer-link">
-                     {{ isLoginMode ? 'Sign up' : 'Sign in' }}
+                     {{ isLoginMode ? 'Sign up' : 'Login' }}
                   </a>
                </p>
             </div>

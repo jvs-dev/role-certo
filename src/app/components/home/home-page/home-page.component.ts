@@ -44,10 +44,6 @@ export class HomePageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (this.isBrowser) {
-      this.initializeCarousel();
-    }
-    
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
@@ -183,45 +179,8 @@ export class HomePageComponent implements OnInit, OnDestroy {
     return event.eventId;
   }
   
-  // Carousel Methods
-  private initializeCarousel(): void {
-    if (!this.isBrowser) return;
-    
-    this.updateCarouselSettings();
-    window.addEventListener('resize', () => this.updateCarouselSettings());
-  }
-  
-  private updateCarouselSettings(): void {
-    if (!this.isBrowser) return;
-    
-    const width = window.innerWidth;
-    if (width >= 1024) {
-      this.visibleSlides = 3;
-      this.slideWidth = 33.333;
-    } else if (width >= 768) {
-      this.visibleSlides = 2;
-      this.slideWidth = 50;
-    } else {
-      this.visibleSlides = 1;
-      this.slideWidth = 100;
-    }
-  }
-  
-  nextSlide(): void {
-    if (this.currentSlide < this.events.length - this.visibleSlides) {
-      this.currentSlide++;
-    }
-  }
-  
-  prevSlide(): void {
-    if (this.currentSlide > 0) {
-      this.currentSlide--;
-    }
-  }
-  
-  goToSlide(index: number): void {
-    this.currentSlide = index;
-  }
+  // Removidas funções de navegação do carrossel
+  // O carrossel agora usa scroll-snap para navegação arrastável
   
   // Navigation Methods
   toggleMobileMenu(): void {

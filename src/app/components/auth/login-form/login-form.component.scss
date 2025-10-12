@@ -1,7 +1,7 @@
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: 10px;
   
   &__field {
     display: flex;
@@ -221,13 +221,11 @@
     border: 1px solid transparent;
     
     &--primary {
-      background: #FF5722;
-      color: var(--white);
-      border-color: #FF5722;
-      
+      background: var(--primary-color);
+      color: var(--white);      
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
       &:hover:not(:disabled) {
-        background: #E64A19;
-        border-color: #E64A19;
+        background: var(--primary-dark);                
         transform: translateY(-1px);
         box-shadow: var(--shadow-md);
       }
