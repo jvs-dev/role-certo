@@ -53,8 +53,8 @@ export class RegisterFormComponent {
       try {
         const { email, password, displayName } = this.registerForm.value;
         await this.authService.signUp(email, password, displayName);
-        this.toastService.showSuccess('Conta criada com sucesso!', 'Complete seu perfil para continuar.');
-        this.router.navigate(['/perfil/editar']);
+        this.toastService.showSuccess('Conta criada com sucesso!', 'Bem-vindo ao Rolê Certo.');
+        this.router.navigate(['/perfil/me']);
       } catch (error: any) {
         this.toastService.showError('Erro no cadastro', this.getErrorMessage(error));
       } finally {
@@ -70,7 +70,7 @@ export class RegisterFormComponent {
     try {
       await this.authService.signInWithGoogle();
       this.toastService.showSuccess('Conta criada com Google!');
-      this.router.navigate(['/perfil/editar']);
+      this.router.navigate(['/perfil/me']);
     } catch (error: any) {
       this.toastService.showError('Erro no cadastro com Google', this.getErrorMessage(error));
     } finally {
