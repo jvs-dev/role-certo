@@ -33,10 +33,10 @@ export class PicosMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      // Small delay to ensure DOM is ready
+      // Increase delay to ensure DOM is fully ready
       setTimeout(() => {
         this.initializeMap();
-      }, 100);
+      }, 300);
     }
   }
 
@@ -50,6 +50,11 @@ export class PicosMapComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       this.picos = await this.picoService.getAllPicos();
       this.isLoading = false;
+      
+      // If map is already initialized, add markers now
+      if (this.map) {
+        this.addPicoMarkers();
+      }
     } catch (error) {
       console.error('Error loading picos:', error);
       this.isLoading = false;
@@ -74,8 +79,25 @@ export class PicosMapComponent implements OnInit, AfterViewInit, OnDestroy {
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       });
 
-      // Create map
+      // Check if map container exists before creating map
+      const mapElement = document.getElementById('map');
+      if (!mapElement) {
+        console.error('Map container not found');
+        return;
+      }
+
+      // Create map only if it doesn't already exist
       if (!this.map) {
+        // Ensure the map container has dimensions
+        if (mapElement.offsetWidth === 0 || mapElement.offsetHeight === 0) {
+          console.warn('Map container has zero dimensions, retrying...');
+          // Retry after a short delay
+          setTimeout(() => {
+            this.initializeMap();
+          }, 500);
+          return;
+        }
+
         this.map = L.map('map').setView([-12.9714, -38.5014], 13); // Default to Salvador
 
         // Add tile layer
