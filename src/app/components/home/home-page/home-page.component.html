@@ -41,16 +41,16 @@
 
         <div class="home-page__search-filters">
           <select class="home-page__filter-select">
-            <option value="all">All Events</option>
-            <option value="music">Music</option>
-            <option value="party">Party</option>
+            <option value="all">Todos</option>
+            <option value="music">Musicas</option>
+            <option value="party">Festas</option>
             <option value="festival">Festival</option>
           </select>
 
           <select class="home-page__filter-select">
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="popular">Popular</option>
+            <option value="newest">Novos</option>
+            <option value="oldest">Antigos</option>
+            <option value="popular">Populares</option>
           </select>
 
           <!-- Removed the map button as requested -->
@@ -113,7 +113,7 @@
   <!-- Upcoming Events Grid Section -->
   <section class="home-page__upcoming-events" *ngIf="!isLoadingUpcomingEvents && upcomingEvents.length > 0">
     <div class="home-page__container">
-      <h2 class="home-page__section-title">Todos os Eventos Futuros</h2>
+      <h2 class="home-page__section-title">Todos os Eventos</h2>
       
       <div class="home-page__events-grid">
         <div class="home-page__event-card" *ngFor="let event of upcomingEvents">
