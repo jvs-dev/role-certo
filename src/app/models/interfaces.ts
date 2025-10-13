@@ -36,6 +36,11 @@ export interface Event {
   creatorName: string;
   creatorPhotoURL: string;
   imageUrl?: string; // Optional event image URL
+  // Recurring event fields
+  isRecurring?: boolean;
+  recurrenceType?: 'weekly' | 'monthly';
+  weeklyDays?: string[]; // Array of days (monday, tuesday, etc.)
+  monthlyDays?: string; // Comma-separated days (1, 15, 30)
 }
 
 export interface EventFormData {
@@ -57,6 +62,11 @@ export interface EventFormData {
   maxParticipants: number;
   privacy: 'aberta' | 'fechada';
   imageUrl?: string; // Optional image URL
+  // Recurring event fields
+  isRecurring?: boolean;
+  recurrenceType?: 'weekly' | 'monthly';
+  weeklyDays?: string[]; // Array of days (monday, tuesday, etc.)
+  monthlyDays?: string; // Comma-separated days (1, 15, 30)
 }
 
 export interface UserProfile {

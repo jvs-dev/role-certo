@@ -17,16 +17,67 @@ export class EventService {
   }
 
   async createEvent(eventData: EventFormData, creatorId: string, creatorName: string, creatorPhotoURL: string): Promise<string> {
-    const eventDoc = {
-      ...eventData,
-      eventDate: Timestamp.fromDate(new Date(eventData.eventDate + 'T' + eventData.eventTime)),
+    // For recurring events, we need to handle the date properly
+    let eventDateTimestamp;
+    
+    if (eventData.isRecurring) {
+      // For recurring events, we still store the original date but mark it as recurring
+      // The frontend logic will determine how to display it
+      eventDateTimestamp = Timestamp.fromDate(new Date(eventData.eventDate + 'T' + eventData.eventTime));
+    } else {
+      // For regular events, use the normal date logic
+      eventDateTimestamp = Timestamp.fromDate(new Date(eventData.eventDate + 'T' + eventData.eventTime));
+    }
+    
+    // Prepare the event document, excluding undefined values
+    const eventDoc: any = {
+      eventName: eventData.eventName,
+      location: {
+        address: eventData.location.address,
+        city: eventData.location.city,
+        state: eventData.location.state
+      },
+      eventDate: eventDateTimestamp,
+      eventTime: eventData.eventTime,
+      minAge: eventData.minAge,
+      details: eventData.details,
+      whatsappLink: eventData.whatsappLink,
+      maxParticipants: eventData.maxParticipants,
       participants: [],
+      privacy: eventData.privacy,
       creatorId,
       creatorName,
       creatorPhotoURL,
       createdAt: Timestamp.now()
     };
-
+    
+    // Add coordinates if they exist
+    if (eventData.coordinates) {
+      eventDoc.coordinates = eventData.coordinates;
+    }
+    
+    // Add imageUrl if it exists
+    if (eventData.imageUrl) {
+      eventDoc.imageUrl = eventData.imageUrl;
+    }
+    
+    // Add recurring event fields only if they exist
+    if (eventData.isRecurring) {
+      eventDoc.isRecurring = eventData.isRecurring;
+      
+      if (eventData.recurrenceType) {
+        eventDoc.recurrenceType = eventData.recurrenceType;
+      }
+      
+      if (eventData.weeklyDays && eventData.weeklyDays.length > 0) {
+        eventDoc.weeklyDays = eventData.weeklyDays;
+      }
+      
+      if (eventData.monthlyDays) {
+        eventDoc.monthlyDays = eventData.monthlyDays;
+      }
+    }
+    
     const docRef = await addDoc(this.eventsCollection, eventDoc);
     
     // Update event document with its own ID
@@ -65,18 +116,17 @@ export class EventService {
       
       if (userCity) {
         // First try to get events from user's city
+        // Include both upcoming events and recurring events
         q = query(
           this.eventsCollection,
           where('location.city', '==', userCity),
-          where('eventDate', '>=', Timestamp.now()),
           orderBy('eventDate', 'asc'),
           limit(limitCount)
         );
       } else {
-        // If no city provided, get all upcoming events
+        // If no city provided, get all events (upcoming and recurring)
         q = query(
           this.eventsCollection,
-          where('eventDate', '>=', Timestamp.now()),
           orderBy('eventDate', 'asc'),
           limit(limitCount)
         );
@@ -84,14 +134,25 @@ export class EventService {
 
       const querySnapshot = await getDocs(q);
       const events: Event[] = [];
+      const now = new Date();
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        events.push({
-          ...data,
-          eventId: doc.id,
-          eventDate: data['eventDate'].toDate()
-        } as Event);
+        const eventDate = data['eventDate'].toDate();
+        
+        // Include the event if:
+        // 1. It's an upcoming event (normal event)
+        // 2. It's a recurring event (regardless of date)
+        const isUpcomingEvent = eventDate >= now;
+        const isRecurringEvent = data['isRecurring'] === true;
+        
+        if (isUpcomingEvent || isRecurringEvent) {
+          events.push({
+            ...data,
+            eventId: doc.id,
+            eventDate: eventDate
+          } as Event);
+        }
       });
 
       // Store the last document for pagination
@@ -117,7 +178,6 @@ export class EventService {
         q = query(
           this.eventsCollection,
           where('location.city', '==', userCity),
-          where('eventDate', '>=', Timestamp.now()),
           orderBy('eventDate', 'asc'),
           startAfter(lastDoc),
           limit(limitCount)
@@ -125,7 +185,6 @@ export class EventService {
       } else {
         q = query(
           this.eventsCollection,
-          where('eventDate', '>=', Timestamp.now()),
           orderBy('eventDate', 'asc'),
           startAfter(lastDoc),
           limit(limitCount)
@@ -134,14 +193,25 @@ export class EventService {
 
       const querySnapshot = await getDocs(q);
       const events: Event[] = [];
+      const now = new Date();
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        events.push({
-          ...data,
-          eventId: doc.id,
-          eventDate: data['eventDate'].toDate()
-        } as Event);
+        const eventDate = data['eventDate'].toDate();
+        
+        // Include the event if:
+        // 1. It's an upcoming event (normal event)
+        // 2. It's a recurring event (regardless of date)
+        const isUpcomingEvent = eventDate >= now;
+        const isRecurringEvent = data['isRecurring'] === true;
+        
+        if (isUpcomingEvent || isRecurringEvent) {
+          events.push({
+            ...data,
+            eventId: doc.id,
+            eventDate: eventDate
+          } as Event);
+        }
       });
 
       // Update the last document for next pagination
@@ -162,12 +232,12 @@ export class EventService {
       // In a production app, you might want to use Algolia or similar service
       const q = query(
         this.eventsCollection,
-        where('eventDate', '>=', Timestamp.now()),
         orderBy('eventDate', 'asc')
       );
 
       const querySnapshot = await getDocs(q);
       const events: Event[] = [];
+      const now = new Date();
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
@@ -177,14 +247,22 @@ export class EventService {
           eventDate: data['eventDate'].toDate()
         } as Event;
 
-        // Client-side filtering for search term
-        const searchLower = searchTerm.toLowerCase();
-        if (
-          event.eventName.toLowerCase().includes(searchLower) ||
-          event.location.city.toLowerCase().includes(searchLower) ||
-          event.location.state.toLowerCase().includes(searchLower)
-        ) {
-          events.push(event);
+        // Include the event if:
+        // 1. It's an upcoming event (normal event)
+        // 2. It's a recurring event (regardless of date)
+        const isUpcomingEvent = event.eventDate >= now;
+        const isRecurringEvent = event.isRecurring === true;
+        
+        if (isUpcomingEvent || isRecurringEvent) {
+          // Client-side filtering for search term
+          const searchLower = searchTerm.toLowerCase();
+          if (
+            event.eventName.toLowerCase().includes(searchLower) ||
+            event.location.city.toLowerCase().includes(searchLower) ||
+            event.location.state.toLowerCase().includes(searchLower)
+          ) {
+            events.push(event);
+          }
         }
       });
 
@@ -224,15 +302,47 @@ export class EventService {
   async updateEvent(eventId: string, eventData: Partial<EventFormData>): Promise<void> {
     const eventRef = doc(this.firestore, 'events', eventId);
     
+    // Prepare the update data, excluding undefined values
+    const updateData: any = {};
+    
+    // Add fields that exist in eventData
+    if (eventData.eventName !== undefined) updateData.eventName = eventData.eventName;
+    if (eventData.location !== undefined) updateData.location = eventData.location;
+    if (eventData.coordinates !== undefined) updateData.coordinates = eventData.coordinates;
+    if (eventData.eventTime !== undefined) updateData.eventTime = eventData.eventTime;
+    if (eventData.minAge !== undefined) updateData.minAge = eventData.minAge;
+    if (eventData.details !== undefined) updateData.details = eventData.details;
+    if (eventData.whatsappLink !== undefined) updateData.whatsappLink = eventData.whatsappLink;
+    if (eventData.maxParticipants !== undefined) updateData.maxParticipants = eventData.maxParticipants;
+    if (eventData.privacy !== undefined) updateData.privacy = eventData.privacy;
+    if (eventData.imageUrl !== undefined) updateData.imageUrl = eventData.imageUrl;
+    
+    // Handle eventDate and time
     if (eventData.eventDate && eventData.eventTime) {
-      const updateData = {
-        ...eventData,
-        eventDate: Timestamp.fromDate(new Date(eventData.eventDate + 'T' + eventData.eventTime))
-      };
-      await updateDoc(eventRef, updateData);
-    } else {
-      await updateDoc(eventRef, eventData);
+      updateData.eventDate = Timestamp.fromDate(new Date(eventData.eventDate + 'T' + eventData.eventTime));
+    } else if (eventData.eventDate) {
+      // If only date is provided, we need to preserve the time
+      // This would require fetching the existing event first to get the time
     }
+    
+    // Add recurring event fields only if they exist
+    if (eventData.isRecurring !== undefined) {
+      updateData.isRecurring = eventData.isRecurring;
+      
+      if (eventData.recurrenceType !== undefined) {
+        updateData.recurrenceType = eventData.recurrenceType;
+      }
+      
+      if (eventData.weeklyDays !== undefined) {
+        updateData.weeklyDays = eventData.weeklyDays;
+      }
+      
+      if (eventData.monthlyDays !== undefined) {
+        updateData.monthlyDays = eventData.monthlyDays;
+      }
+    }
+    
+    await updateDoc(eventRef, updateData);
   }
 
   async deleteEvent(eventId: string): Promise<void> {

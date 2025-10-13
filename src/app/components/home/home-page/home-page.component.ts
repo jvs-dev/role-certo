@@ -18,12 +18,14 @@ import { FooterComponent } from '../../shared/footer/footer.component';
   styleUrl: './home-page.component.scss'
 })
 export class HomePageComponent implements OnInit, OnDestroy {
-  events: Event[] = [];
+  events: Event[] = []; // Recent events for carousel
+  upcomingEvents: Event[] = []; // All upcoming events for grid
   currentUser: User | null = null;
   isLoading = false;
   isSearching = false;
   isLoadingMore = false;
   hasMoreEvents = true;
+  isLoadingUpcomingEvents = true;
   
   // Carousel properties
   currentSlide = 0;
@@ -52,6 +54,7 @@ export class HomePageComponent implements OnInit, OnDestroy {
         this.currentUser = user;
         if (this.isBrowser) {
           this.loadInitialEvents();
+          this.loadUpcomingEvents();
         }
       });
 
@@ -90,6 +93,25 @@ export class HomePageComponent implements OnInit, OnDestroy {
       this.toastService.showError('Erro ao carregar eventos');
     } finally {
       this.loadingService.hide('home-events');
+    }
+  }
+
+  async loadUpcomingEvents(): Promise<void> {
+    this.isLoadingUpcomingEvents = true;
+    try {
+      const userCity = this.currentUser?.location?.city || undefined;
+      // Load more upcoming events (30 should be enough for most cases)
+      this.upcomingEvents = await this.eventService.getEvents(userCity, 30);
+      
+      if (this.upcomingEvents.length === 0 && userCity) {
+        // If no events in user's city, load general events
+        this.upcomingEvents = await this.eventService.getEvents(undefined, 30);
+      }
+    } catch (error) {
+      console.error('Error loading upcoming events:', error);
+      this.toastService.showError('Erro ao carregar eventos futuros');
+    } finally {
+      this.isLoadingUpcomingEvents = false;
     }
   }
 

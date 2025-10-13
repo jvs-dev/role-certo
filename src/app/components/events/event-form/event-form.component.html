@@ -25,12 +25,12 @@
           <span *ngIf="currentStep <= 2">2</span>
           <span *ngIf="currentStep > 2" class="check-icon"><i class="bi bi-check"></i></span>
         </div>
-        <div class="step-label">Detalhes</div>
+        <div class="step-label">Localização</div>
       </div>
       <div class="step-connector"></div>
       <div class="step" [class.active]="currentStep === 3">
         <div class="step-icon">3</div>
-        <div class="step-label">Privacidade</div>
+        <div class="step-label">Detalhes</div>
       </div>
     </div>
 
@@ -55,61 +55,8 @@
             <span class="error-message" *ngIf="hasError('eventName')">{{ getError('eventName') }}</span>
           </div>
 
-          <!-- Endereço -->
-          <div class="form-group span-2" formGroupName="location">
-            <label for="address">Endereço Completo *</label>
-            <div class="address-input-wrapper">
-              <input 
-                id="address" 
-                formControlName="address" 
-                placeholder="Ex: Rua das Flores, 123 - Bairro"
-                [class.error]="hasError('location.address')"
-              >
-              <button 
-                type="button" 
-                class="btn-verify-location" 
-                (click)="verifyLocation()"
-                [disabled]="isVerifyingLocation"
-                title="Verificar Localização"
-              >
-                <i class="bi bi-geo-alt" *ngIf="!isVerifyingLocation && !locationVerified"></i>
-                <i class="bi bi-hourglass-split" *ngIf="isVerifyingLocation"></i>
-                <i class="bi bi-check-circle-fill" *ngIf="!isVerifyingLocation && locationVerified"></i>
-                {{ isVerifyingLocation ? 'Verificando...' : (locationVerified ? 'Verificado' : 'Verificar') }}
-              </button>
-            </div>
-            <span class="error-message" *ngIf="hasError('location.address')">{{ getError('location.address') }}</span>
-            <small class="location-hint" *ngIf="locationVerified">
-              <i class="bi bi-check-circle"></i> Localização verificada! O evento aparecerá no mapa.
-            </small>
-          </div>
-
-          <!-- Cidade -->
-          <div class="form-group" formGroupName="location">
-            <label for="city">Cidade *</label>
-            <input 
-              id="city" 
-              formControlName="city" 
-              placeholder="Ex: Salvador"
-              [class.error]="hasError('location.city')"
-            >
-            <span class="error-message" *ngIf="hasError('location.city')">{{ getError('location.city') }}</span>
-          </div>
-
-          <!-- Estado -->
-          <div class="form-group" formGroupName="location">
-            <label for="state">Estado *</label>
-            <input 
-              id="state" 
-              formControlName="state" 
-              placeholder="Ex: BA"
-              [class.error]="hasError('location.state')"
-            >
-            <span class="error-message" *ngIf="hasError('location.state')">{{ getError('location.state') }}</span>
-          </div>
-
-          <!-- Data -->
-          <div class="form-group">
+          <!-- Data (only shown for non-recurring events) -->
+          <div class="form-group" *ngIf="!eventForm.get('isRecurring')?.value">
             <label for="eventDate">Data do Evento *</label>
             <input 
               id="eventDate" 
@@ -131,11 +78,150 @@
             >
             <span class="error-message" *ngIf="hasError('eventTime')">{{ getError('eventTime') }}</span>
           </div>
+
+          <!-- Recurring Event Toggle -->
+          <div class="form-group span-2">
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                formControlName="isRecurring"
+              >
+              <span class="checkbox-text">Este é um evento recorrente</span>
+            </label>
+          </div>
+
+          <!-- Recurring Options (shown when isRecurring is true) -->
+          <div class="form-group span-2" *ngIf="eventForm.get('isRecurring')?.value">
+            <label for="recurrenceType">Tipo de Recorrência *</label>
+            <select 
+              id="recurrenceType" 
+              formControlName="recurrenceType"
+              [class.error]="hasError('recurrenceType')"
+            >
+              <option value="">Selecione o tipo de recorrência</option>
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensal</option>
+            </select>
+            <span class="error-message" *ngIf="hasError('recurrenceType')">{{ getError('recurrenceType') }}</span>
+          </div>
+
+          <!-- Weekly Recurrence Options -->
+          <div class="form-group span-2" *ngIf="eventForm.get('isRecurring')?.value && eventForm.get('recurrenceType')?.value === 'weekly'">
+            <label>Dias da Semana *</label>
+            <div class="weekly-days">
+              <label class="day-checkbox" 
+                     *ngFor="let day of weekDays"
+                     [class.selected]="isDaySelected(day.value)">
+                <input 
+                  type="checkbox" 
+                  [value]="day.value" 
+                  [checked]="isDaySelected(day.value)"
+                  (change)="onWeekDayChange(day.value, $event)"
+                >
+                <span class="checkbox-text">{{ day.label }}</span>
+              </label>
+            </div>
+            <span class="error-message" *ngIf="hasError('weeklyDays') && eventForm.get('recurrenceType')?.value === 'weekly'">
+              Selecione pelo menos um dia da semana
+            </span>
+          </div>
+
+          <!-- Monthly Recurrence Options -->
+          <div class="form-group span-2" *ngIf="eventForm.get('isRecurring')?.value && eventForm.get('recurrenceType')?.value === 'monthly'">
+            <label for="monthlyDays">Dias do Mês (separados por vírgula) *</label>
+            <input 
+              id="monthlyDays" 
+              type="text" 
+              formControlName="monthlyDays"
+              placeholder="Ex: 1, 15, 30"
+              [class.error]="hasError('monthlyDays')"
+            >
+            <span class="error-message" *ngIf="hasError('monthlyDays')">{{ getError('monthlyDays') }}</span>
+            <small class="field-hint">Insira os dias do mês separados por vírgula (1-31)</small>
+          </div>
         </div>
       </div>
 
-      <!-- Passo 2: Detalhes -->
+      <!-- Passo 2: Localização com Mapa -->
       <div class="form-step-content" *ngIf="currentStep === 2">
+        <h2 class="step-title">Localização do Evento</h2>
+        <p class="step-subtitle">Informe o endereço e selecione a localização exata no mapa.</p>
+        
+        <div class="form-grid">
+          <!-- Endereço -->
+          <div class="form-group span-2" formGroupName="location">
+            <label for="map-address">Endereço Completo *</label>
+            <div class="address-input-wrapper">
+              <input 
+                id="map-address"
+                formControlName="address" 
+                placeholder="Ex: Rua das Palmeiras, 123, Salvador, BA"
+                [class.error]="hasError('location.address')"
+                required>
+              <button 
+                type="button" 
+                class="btn-verify-location"
+                (click)="geocodeAddress()"
+                [disabled]="isVerifyingLocation"
+                title="Verificar Localização"
+              >
+                <i class="bi bi-geo-alt" *ngIf="!isVerifyingLocation"></i>
+                <i class="bi bi-hourglass-split" *ngIf="isVerifyingLocation"></i>
+                {{ isVerifyingLocation ? 'Buscando...' : 'Buscar' }}
+              </button>
+            </div>
+            <div class="geocoding-results" *ngIf="geocodingResults.length > 0">
+              <div class="result-item" 
+                   *ngFor="let result of geocodingResults"
+                   (click)="selectGeocodingResult(result)">
+                {{ result.display_name }}
+              </div>
+            </div>
+            <div class="error-message" *ngIf="geocodingError">
+              {{ geocodingError }}
+            </div>
+            <span class="error-message" *ngIf="hasError('location.address')">{{ getError('location.address') }}</span>
+          </div>
+
+          <!-- Cidade -->
+          <div class="form-group" formGroupName="location">
+            <label for="map-city">Cidade *</label>
+            <input 
+              id="map-city" 
+              formControlName="city" 
+              placeholder="Ex: Salvador"
+              [class.error]="hasError('location.city')"
+            >
+            <span class="error-message" *ngIf="hasError('location.city')">{{ getError('location.city') }}</span>
+          </div>
+
+          <!-- Estado -->
+          <div class="form-group" formGroupName="location">
+            <label for="map-state">Estado *</label>
+            <input 
+              id="map-state" 
+              formControlName="state" 
+              placeholder="Ex: BA"
+              [class.error]="hasError('location.state')"
+            >
+            <span class="error-message" *ngIf="hasError('location.state')">{{ getError('location.state') }}</span>
+          </div>
+
+          <!-- Mapa -->
+          <div class="form-group span-2">
+            <label>Selecione no mapa *</label>
+            <div id="event-map" class="map"></div>
+            <small class="field-hint">Clique no mapa para selecionar a localização exata do evento.</small>
+            <div class="coordinates-display" *ngIf="eventForm.get('coordinates')?.value">
+              Coordenadas: {{ eventForm.get('coordinates')?.value.lat | number:'1.4-4' }}, {{ eventForm.get('coordinates')?.value.lng | number:'1.4-4' }}
+            </div>
+            <span class="error-message" *ngIf="!eventForm.get('coordinates')?.value && submitError">Por favor, selecione a localização no mapa.</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Passo 3: Detalhes -->
+      <div class="form-step-content" *ngIf="currentStep === 3">
         <h2 class="step-title">Detalhes do Evento</h2>
         <p class="step-subtitle">Forneça mais informações para os participantes.</p>
         
@@ -192,15 +278,7 @@
               placeholder="Ex: Traga sua bebida, teremos petiscos, música ao vivo..."
             ></textarea>
           </div>
-        </div>
-      </div>
-      
-      <!-- Passo 3: Privacidade e Banner -->
-      <div class="form-step-content" *ngIf="currentStep === 3">
-        <h2 class="step-title">Privacidade e Imagem</h2>
-        <p class="step-subtitle">Defina quem pode ver seu evento e adicione um toque visual.</p>
-        
-        <div class="form-grid">
+          
           <!-- Opções de Privacidade -->
           <div class="form-group span-2">
             <label>Privacidade do Evento *</label>
@@ -267,7 +345,7 @@
           class="btn btn-primary" 
           *ngIf="currentStep < 3" 
           (click)="nextStep()"
-          [disabled]="isLoading"
+          [disabled]="isLoading || (currentStep === 1 && eventForm.get('eventName')?.invalid)"
         >
           Próximo <i class="bi bi-arrow-right"></i>
         </button>

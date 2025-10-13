@@ -48,11 +48,22 @@ export class EventDetailsComponent implements OnInit, OnDestroy {
   }
   
   get isEventPast(): boolean {
+    // Recurring events never expire
+    if (this.event && this.event.isRecurring) {
+      return false;
+    }
+    
     return this.event ? this.event.eventDate < new Date() : false;
   }
   
   get daysUntilEvent(): number {
     if (!this.event) return 0;
+    
+    // For recurring events, show a special value
+    if (this.event.isRecurring) {
+      return -1; // Special value to indicate recurring event
+    }
+    
     const diffTime = this.event.eventDate.getTime() - new Date().getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
@@ -227,6 +238,25 @@ export class EventDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Utility method to format weekly days for display
+  formatWeeklyDays(weeklyDays: string[]): string {
+    if (!weeklyDays || weeklyDays.length === 0) {
+      return '';
+    }
+    
+    const dayNames: { [key: string]: string } = {
+      'monday': 'Segunda',
+      'tuesday': 'Terça',
+      'wednesday': 'Quarta',
+      'thursday': 'Quinta',
+      'friday': 'Sexta',
+      'saturday': 'Sábado',
+      'sunday': 'Domingo'
+    };
+    
+    return weeklyDays.map(day => dayNames[day] || day).join(', ');
+  }
+
   // Utility methods for template
   formatDate(date: Date): string {
     return date.toLocaleDateString('pt-BR', {
@@ -245,16 +275,18 @@ export class EventDetailsComponent implements OnInit, OnDestroy {
   }
 
   getEventStatusText(): string {
-    if (this.isEventPast) return 'Evento Finalizado';
+    if (this.isEventPast && !this.event?.isRecurring) return 'Evento Finalizado';
     if (this.isEventFull) return 'Evento Lotado';
+    if (this.event?.isRecurring) return 'Evento Recorrente';
     if (this.daysUntilEvent === 0) return 'Hoje!';
     if (this.daysUntilEvent === 1) return 'Amanhã';
     return `Em ${this.daysUntilEvent} dias`;
   }
 
   getEventStatusClass(): string {
-    if (this.isEventPast) return 'status-past';
+    if (this.isEventPast && !this.event?.isRecurring) return 'status-past';
     if (this.isEventFull) return 'status-full';
+    if (this.event?.isRecurring) return 'status-recurring';
     if (this.daysUntilEvent <= 1) return 'status-soon';
     return 'status-upcoming';
   }

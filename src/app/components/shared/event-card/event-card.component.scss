@@ -35,6 +35,13 @@
     flex: 1;
   }
   
+  &__badges {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    align-items: flex-end;
+  }
+  
   &__privacy {
     font-size: var(--font-size-xs);
     font-weight: 500;
@@ -53,6 +60,19 @@
       background: rgba(245, 158, 11, 0.1);
       color: var(--warning);
     }
+  }
+  
+  &__recurring-badge {
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-full);
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
   }
   
   &__info {
@@ -156,6 +176,12 @@
     
     &__info {
       margin-bottom: var(--spacing-md);
+    }
+    
+    &__badges {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
   }
 }

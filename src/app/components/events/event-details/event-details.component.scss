@@ -145,24 +145,25 @@ $desktop: 1280px;
   width: fit-content;
   
   &.status-upcoming {
-    background: rgba(16, 185, 129, 0.9);
-    color: white;
+    background: linear-gradient(135deg, #3B82F6, #60A5FA);
   }
-  
+
   &.status-soon {
-    background: rgba(245, 158, 11, 0.9);
-    color: white;
+    background: linear-gradient(135deg, #F59E0B, #FBBF24);
   }
-  
+
   &.status-full {
-    background: rgba(239, 68, 68, 0.9);
-    color: white;
+    background: linear-gradient(135deg, #EF4444, #F87171);
+  }
+
+  &.status-past {
+    background: linear-gradient(135deg, #6B7280, #9CA3AF);
   }
   
-  &.status-past {
-    background: rgba(107, 114, 128, 0.9);
-    color: white;
+  &.status-recurring {
+    background: linear-gradient(135deg, #8B5CF6, #A78BFA);
   }
+
 }
 
 .event-title {

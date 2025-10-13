@@ -110,6 +110,90 @@
     </div>
   </section>
 
+  <!-- Upcoming Events Grid Section -->
+  <section class="home-page__upcoming-events" *ngIf="!isLoadingUpcomingEvents && upcomingEvents.length > 0">
+    <div class="home-page__container">
+      <h2 class="home-page__section-title">Todos os Eventos Futuros</h2>
+      
+      <div class="home-page__events-grid">
+        <div class="home-page__event-card" *ngFor="let event of upcomingEvents">
+          <div class="home-page__event-image">
+            <img [src]="event.imageUrl || 'assets/default-event.jpg'" [alt]="event.eventName"
+              class="home-page__event-img" />
+            <div class="home-page__event-date">
+              <span class="home-page__event-day">{{
+                getEventDay(event.eventDate)
+                }}</span>
+              <span class="home-page__event-month">{{
+                getEventMonth(event.eventDate)
+                }}</span>
+              <span class="home-page__event-year">{{
+                getEventYear(event.eventDate)
+                }}</span>
+            </div>
+          </div>
+
+          <div class="home-page__event-info">
+            <h3 class="home-page__event-title">{{ event.eventName }}</h3>
+            <div class="home-page__event-details">
+              <p class="home-page__event-location">
+                <i class="bi bi-geo-alt-fill"></i>
+                {{ event.location.city }} • {{ event.eventTime }}
+              </p>
+            </div>
+
+            <div class="home-page__event-actions">
+              <button class="home-page__btn home-page__btn--primary" (click)="buyTicket(event.eventId)">
+                Buy Ticket
+              </button>
+              <button class="home-page__btn home-page__btn--secondary" (click)="viewEventDetails(event.eventId)">
+                More Info
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Upcoming Events Loading State -->
+  <section class="home-page__loading" *ngIf="isLoadingUpcomingEvents">
+    <div class="home-page__container">
+      <h2 class="home-page__section-title">Todos os Eventos Futuros</h2>
+      <div class="home-page__loading-grid">
+        <div class="home-page__skeleton" *ngFor="let i of [1, 2, 3, 4, 5, 6]">
+          <div class="home-page__skeleton-card">
+            <div class="home-page__skeleton-image"></div>
+            <div class="home-page__skeleton-content">
+              <div class="home-page__skeleton-line"></div>
+              <div class="home-page__skeleton-line home-page__skeleton-line--short"></div>
+              <div class="home-page__skeleton-buttons"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Upcoming Events Empty State -->
+  <section class="home-page__upcoming-events-empty" *ngIf="!isLoadingUpcomingEvents && upcomingEvents.length === 0">
+    <div class="home-page__container">
+      <h2 class="home-page__section-title">Todos os Eventos Futuros</h2>
+      <div class="home-page__empty-content">
+        <div class="home-page__empty-icon">
+          <i class="bi bi-calendar-x"></i>
+        </div>
+        <h3 class="home-page__empty-title">Nenhum evento futuro encontrado</h3>
+        <p class="home-page__empty-message">
+          Não há eventos futuros programados no momento. Volte mais tarde ou seja o primeiro a criar um evento!
+        </p>
+        <a class="home-page__btn home-page__btn--primary" routerLink="/criar-evento">
+          Criar Primeiro Evento
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- Loading State -->
   <section class="home-page__loading" *ngIf="isLoading">
     <div class="home-page__container">

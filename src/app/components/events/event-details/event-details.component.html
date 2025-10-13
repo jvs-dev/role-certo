@@ -50,8 +50,18 @@
                <div class="card-icon"><i class="bi bi-calendar-week"></i></div>
                <div class="card-content">
                   <h3>Data e Hora</h3>
-                  <p class="primary-text">{{ formatDate(event.eventDate) }}</p>
+                  <p class="primary-text" *ngIf="!event.isRecurring">{{ formatDate(event.eventDate) }}</p>
+                  <p class="primary-text" *ngIf="event.isRecurring">
+                    <span *ngIf="event.recurrenceType === 'weekly'">Semanalmente</span>
+                    <span *ngIf="event.recurrenceType === 'monthly'">Mensalmente</span>
+                  </p>
                   <p class="secondary-text">{{ formatTime(event.eventDate) }}</p>
+                  <p class="secondary-text" *ngIf="event.isRecurring && event.recurrenceType === 'weekly'">
+                    Nos dias: {{ formatWeeklyDays(event.weeklyDays || []) }}
+                  </p>
+                  <p class="secondary-text" *ngIf="event.isRecurring && event.recurrenceType === 'monthly'">
+                    Nos dias: {{ event.monthlyDays }}
+                  </p>
                </div>
             </div>
 

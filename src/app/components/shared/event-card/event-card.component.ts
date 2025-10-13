@@ -19,6 +19,17 @@ export class EventCardComponent {
   }
 
   getEventDate(): string {
+    // For recurring events, show a special indicator instead of the date
+    if (this.event.isRecurring) {
+      if (this.event.recurrenceType === 'weekly') {
+        return 'Semanal';
+      } else if (this.event.recurrenceType === 'monthly') {
+        return 'Mensal';
+      }
+      return 'Recorrente';
+    }
+    
+    // For regular events, show the normal date
     return this.event.eventDate.toLocaleDateString('pt-BR', {
       weekday: 'short',
       day: '2-digit',
@@ -36,5 +47,9 @@ export class EventCardComponent {
 
   getEventLocation(): string {
     return `${this.event.location.city}, ${this.event.location.state}`;
+  }
+  
+  isRecurringEvent(): boolean {
+    return this.event.isRecurring === true;
   }
 }
