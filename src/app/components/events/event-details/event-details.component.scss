@@ -251,10 +251,11 @@ $desktop: 1280px;
   flex: 1;
 
   h3 {
-    margin: 0 0 0.5rem 0;
+    margin: 0;
     color: $text-dark;
     font-size: 1rem;
     font-weight: 600;
+    line-height: 110%;
   }
 
   .primary-text {

@@ -106,7 +106,7 @@ export class EventFormComponent implements OnInit, AfterViewInit {
       eventTime: ['', Validators.required],
       minAge: [18, [Validators.required, Validators.min(0), Validators.max(99)]],
       maxParticipants: [50, [Validators.required, Validators.min(1)]],
-      whatsappLink: ['', [Validators.required, Validators.pattern(/^https?:\/\/(wa\.me|chat\.whatsapp\.com)\/.+/)]],
+      whatsappLink: ['', [Validators.pattern(/^https?:\/\/(wa\.me|chat\.whatsapp\.com)\/.+/)]], // Removed Validators.required
       details: [''],
       privacy: ['aberta', Validators.required],
       imageUrl: ['', [Validators.pattern(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i)]], // Optional image URL with validation
@@ -270,7 +270,7 @@ export class EventFormComponent implements OnInit, AfterViewInit {
 
   private validateCurrentStep(): boolean {
     const step1Fields = ['eventName', 'eventTime'];
-    const step2Fields = ['minAge', 'maxParticipants', 'whatsappLink'];
+    const step2Fields = ['minAge', 'maxParticipants']; // Removed whatsappLink from required fields
     
     let fieldsToValidate: string[] = [];
     
