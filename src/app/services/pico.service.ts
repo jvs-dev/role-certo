@@ -216,6 +216,22 @@ export class PicoService {
     await updateDoc(picoRef, picoData);
   }
 
+  async updateReview(picoId: string, reviewId: string, reviewData: Partial<ReviewFormData>): Promise<void> {
+    try {
+      const reviewRef = doc(this.firestore, 'picos', picoId, 'reviews', reviewId);
+      await updateDoc(reviewRef, {
+        ...reviewData,
+        updatedAt: Timestamp.now()
+      });
+
+      // Update pico's average rating after review update
+      await this.updatePicoRating(picoId);
+    } catch (error) {
+      console.error('Error updating review:', error);
+      throw error;
+    }
+  }
+
   async deletePico(picoId: string): Promise<void> {
     try {
       const picoRef = doc(this.firestore, 'picos', picoId);

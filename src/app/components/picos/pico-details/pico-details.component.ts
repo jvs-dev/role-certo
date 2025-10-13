@@ -31,8 +31,18 @@ export class PicoDetailsComponent implements OnInit, OnDestroy {
     media: [''] // Start with one empty field for media
   };
   
+  // Edit review form data
+  editReviewForm: ReviewFormData = {
+    rating: 0,
+    comment: '',
+    media: ['']
+  };
+  
   isSubmitting = false;
+  isUpdatingReview = false;
   submitError = '';
+  editSubmitError = '';
+  isEditingReview = false;
   
   // Expose authService to template
   constructor(
@@ -199,6 +209,84 @@ export class PicoDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Edit review form methods
+  addEditMediaField(): void {
+    this.editReviewForm.media.push('');
+  }
+
+  removeEditMediaField(index: number): void {
+    if (this.editReviewForm.media.length > 1) {
+      this.editReviewForm.media.splice(index, 1);
+    }
+  }
+
+  startEditingReview(): void {
+    if (this.currentUserReview) {
+      // Initialize the edit form with current review data
+      this.editReviewForm = {
+        rating: this.currentUserReview.rating,
+        comment: this.currentUserReview.comment || '',
+        media: this.currentUserReview.media && this.currentUserReview.media.length > 0 
+          ? [...this.currentUserReview.media] 
+          : ['']
+      };
+      this.isEditingReview = true;
+    }
+  }
+
+  cancelEditingReview(): void {
+    this.isEditingReview = false;
+    this.editSubmitError = '';
+  }
+
+  async updateReview(): Promise<void> {
+    if (!this.pico || !this.currentUserReview || !this.authService.getCurrentUser()) {
+      return;
+    }
+
+    // Validate form
+    if (this.editReviewForm.rating < 1 || this.editReviewForm.rating > 5) {
+      this.editSubmitError = 'Por favor, selecione uma avaliação de 1 a 5 estrelas.';
+      return;
+    }
+    
+    // Comment is required
+    if (!this.editReviewForm.comment || this.editReviewForm.comment.trim() === '') {
+      this.editSubmitError = 'Por favor, adicione um comentário descrevendo sua experiência.';
+      return;
+    }
+
+    // Filter out empty media URLs
+    this.editReviewForm.media = this.editReviewForm.media.filter(url => url.trim() !== '');
+
+    this.isUpdatingReview = true;
+    this.editSubmitError = '';
+
+    try {
+      const currentUser = this.authService.getCurrentUser()!;
+      await this.picoService.updateReview(
+        this.pico.picoId,
+        this.currentUserReview.reviewId,
+        this.editReviewForm
+      );
+
+      // Reload reviews and user review
+      this.reviews = await this.picoService.getAllReviews(this.pico.picoId);
+      this.currentUserReview = await this.picoService.getUserReview(this.pico.picoId, currentUser.uid);
+
+      // Exit edit mode
+      this.isEditingReview = false;
+
+      // Reload pico data to update average rating
+      this.pico = await this.picoService.getPico(this.pico.picoId);
+    } catch (error) {
+      console.error('Error updating review:', error);
+      this.editSubmitError = 'Erro ao atualizar avaliação. Por favor, tente novamente.';
+    } finally {
+      this.isUpdatingReview = false;
+    }
+  }
+
   async submitReview(): Promise<void> {
     if (!this.pico || !this.authService.getCurrentUser()) {
       return;
@@ -265,6 +353,10 @@ export class PicoDetailsComponent implements OnInit, OnDestroy {
 
   hasInvalidUrls(): boolean {
     return this.reviewForm.media.some(url => url.trim() !== '' && !this.isUrlValid(url));
+  }
+
+  hasInvalidEditUrls(): boolean {
+    return this.editReviewForm.media.some(url => url.trim() !== '' && !this.isUrlValid(url));
   }
 
   isUserAuthenticated(): boolean {

@@ -222,20 +222,109 @@
                      </div>
                   </div>
                   
-                  <div class="review-comment" *ngIf="currentUserReview.comment">
-                     <p>{{ currentUserReview.comment }}</p>
-                  </div>
-                  
-                  <div class="review-media" *ngIf="currentUserReview.media && currentUserReview.media.length > 0">
-                     <div class="media-grid">
-                        <div class="media-item" *ngFor="let mediaUrl of currentUserReview.media">
-                           <img 
-                              [src]="mediaUrl" 
-                              [alt]="'Mídia do usuário'"
-                              (error)="onErrorImage($event)"
-                              class="media-image">
+                  <!-- Display mode -->
+                  <div *ngIf="!isEditingReview">
+                     <div class="review-comment" *ngIf="currentUserReview.comment">
+                        <p>{{ currentUserReview.comment }}</p>
+                     </div>
+                     
+                     <div class="review-media" *ngIf="currentUserReview.media && currentUserReview.media.length > 0">
+                        <div class="media-grid">
+                           <div class="media-item" *ngFor="let mediaUrl of currentUserReview.media">
+                              <img 
+                                 [src]="mediaUrl" 
+                                 [alt]="'Mídia do usuário'"
+                                 (error)="onErrorImage($event)"
+                                 class="media-image">
+                           </div>
                         </div>
                      </div>
+                     
+                     <div class="review-actions">
+                        <button class="btn btn-secondary" (click)="startEditingReview()">
+                           <i class="bi bi-pencil"></i> Editar
+                        </button>
+                     </div>
+                  </div>
+                  
+                  <!-- Edit mode -->
+                  <div *ngIf="isEditingReview">
+                     <form (ngSubmit)="updateReview()" class="review-form">
+                        <div class="form-group">
+                           <label>Avaliação: *</label>
+                           <div class="rating-input">
+                              <span 
+                                 *ngFor="let star of [1,2,3,4,5]; let i = index"
+                                 class="star"
+                                 [class.filled]="i < editReviewForm.rating"
+                                 (click)="editReviewForm.rating = i + 1">
+                                 ★
+                              </span>
+                           </div>
+                        </div>
+                        
+                        <div class="form-group">
+                           <label for="edit-comment">Comentário: *</label>
+                           <textarea 
+                              id="edit-comment"
+                              [(ngModel)]="editReviewForm.comment"
+                              name="comment"
+                              rows="3"
+                              placeholder="Compartilhe sua experiência..."
+                              required>
+                           </textarea>
+                           <div class="field-hint">Descreva sua experiência no pico (obrigatório)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                           <label>Mídias (URLs de fotos/vídeos):</label>
+                           <div class="media-inputs">
+                              <div class="media-input-row" *ngFor="let media of editReviewForm.media; let i = index">
+                                 <input 
+                                   type="text" 
+                                   [(ngModel)]="editReviewForm.media[i]"
+                                   [name]="'media' + i"
+                                   placeholder="Cole a URL de uma foto ou vídeo"
+                                   [class.error]="media.trim() !== '' && !isUrlValid(media)">
+                                 <button 
+                                   type="button" 
+                                   class="remove-btn"
+                                   (click)="removeEditMediaField(i)"
+                                   *ngIf="editReviewForm.media.length > 1">
+                                   <i class="bi bi-x"></i>
+                                 </button>
+                              </div>
+                              
+                              <button 
+                                 type="button" 
+                                 class="add-media-btn"
+                                 (click)="addEditMediaField()">
+                                 <i class="bi bi-plus"></i> Adicionar mais uma mídia
+                              </button>
+                           </div>
+                           <div class="field-hint">Adicione fotos ou vídeos para ilustrar sua experiência (opcional)</div>
+                        </div>
+                        
+                        <div class="form-error" *ngIf="editSubmitError">
+                           {{ editSubmitError }}
+                        </div>
+                        
+                        <div class="form-actions">
+                           <button 
+                              type="button" 
+                              class="btn btn-secondary"
+                              (click)="cancelEditingReview()">
+                              Cancelar
+                           </button>
+                           <button 
+                              type="submit" 
+                              class="btn btn-primary"
+                              [disabled]="isUpdatingReview || editReviewForm.rating === 0 || !editReviewForm.comment.trim() || hasInvalidEditUrls()">
+                              <span *ngIf="!isUpdatingReview"><i class="bi bi-check"></i> Atualizar</span>
+                              <span *ngIf="isUpdatingReview"><i class="bi bi-hourglass-split"></i> Atualizando...</span>
+                           </button>
+                        </div>
+                     </form>
                   </div>
                </div>
             </div>
