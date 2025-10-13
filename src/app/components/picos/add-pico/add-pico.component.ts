@@ -110,8 +110,21 @@ export class AddPicoComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Helper method for tracking items in *ngFor
+  trackByIndex(index: number, item: any): any {
+    return index;
+  }
+
+  // Update photo URL at specific index
+  updatePhotoUrl(index: number, event: any): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.picoForm.photos[index] = inputElement.value;
+    this.onPhotoUrlChange(index);
+  }
+
   // Update image previews when photo URLs change
   onPhotoUrlChange(index: number): void {
+    // Trigger change detection explicitly
     this.updateImagePreviews();
   }
 
@@ -260,11 +273,14 @@ export class AddPicoComponent implements OnInit, OnDestroy {
 
   addPhotoField(): void {
     this.picoForm.photos.push('');
+    // Trigger change detection
+    this.updateImagePreviews();
   }
 
   removePhotoField(index: number): void {
     if (this.picoForm.photos.length > 2) {
       this.picoForm.photos.splice(index, 1);
+      // Trigger change detection
       this.updateImagePreviews();
     }
   }

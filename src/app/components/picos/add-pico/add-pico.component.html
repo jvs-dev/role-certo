@@ -46,14 +46,14 @@
           <div class="form-group span-2">
             <label>Fotos *</label>
             <div class="photo-inputs">
-              <div class="photo-input-row" *ngFor="let photo of picoForm.photos; let i = index">
+              <div class="photo-input-row" *ngFor="let photo of picoForm.photos; let i = index; trackBy: trackByIndex">
                 <input 
                   type="text" 
-                  [(ngModel)]="picoForm.photos[i]"
+                  [value]="photo"
+                  (input)="updatePhotoUrl(i, $event)"
                   [name]="'photo' + i"
                   placeholder="Cole a URL de uma foto"
-                  [class.error]="photo.trim() !== '' && !isUrlValid(photo)"
-                  (input)="onPhotoUrlChange(i)">
+                  [class.error]="photo.trim() !== '' && !isUrlValid(photo)">
                 <button 
                   type="button" 
                   class="remove-btn"
