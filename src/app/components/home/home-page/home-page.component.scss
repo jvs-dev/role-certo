@@ -678,6 +678,27 @@
     }
   }
 
+  // Recurrence display for recurring events
+  &__event-recurrence {
+    position: absolute;
+    top: var(--spacing-sm);
+    left: var(--spacing-sm);
+    background: rgba(139, 95, 191, 0.9); // Purple background for recurring events
+    color: var(--white);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    text-align: center;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    white-space: nowrap;
+    
+    // Smaller recurrence text for grid view
+    .home-page__events-grid & {
+      padding: 4px 8px;
+      font-size: 10px;
+    }
+  }
+
   &__event-day {
     display: block;
     font-size: var(--font-size-base);
