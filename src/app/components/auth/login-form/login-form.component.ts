@@ -1,6 +1,6 @@
 import { Component, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
@@ -8,7 +8,7 @@ import { LoadingService } from '../../../services/loading.service';
 
 @Component({
   selector: 'app-login-form',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss'
 })
@@ -16,6 +16,9 @@ export class LoginFormComponent implements OnDestroy {
   loginForm: FormGroup;
   isLoading = false;
   showPassword = false; // Add this property for password visibility toggle
+  showResetPasswordForm = false; // Add this property for password reset form visibility
+  resetEmail = ''; // Add this property for reset email input
+  resetSuccess = false; // Add this property for reset success message
   private isBrowser: boolean;
   private autoLoginAttempted = false;
 
@@ -87,6 +90,45 @@ export class LoginFormComponent implements OnDestroy {
       }
     } else {
       this.markFormGroupTouched();
+    }
+  }
+
+  // Add this method to handle password reset
+  async onResetPassword(): Promise<void> {
+    if (!this.resetEmail) {
+      this.toastService.showError('Por favor, insira seu email.');
+      return;
+    }
+
+    this.loadingService.show('reset-password');
+    try {
+      await this.authService.sendPasswordResetEmail(this.resetEmail);
+      this.resetSuccess = true;
+      this.toastService.showSuccess('Email de redefinição de senha enviado com sucesso!');
+    } catch (error: any) {
+      this.toastService.showError('Erro ao enviar email', this.getPasswordResetErrorMessage(error));
+    } finally {
+      this.loadingService.hide('reset-password');
+    }
+  }
+
+  // Add this method to toggle password reset form visibility
+  toggleResetPasswordForm(): void {
+    this.showResetPasswordForm = !this.showResetPasswordForm;
+    this.resetSuccess = false;
+    this.resetEmail = '';
+  }
+
+  private getPasswordResetErrorMessage(error: any): string {
+    switch (error.code) {
+      case 'auth/user-not-found':
+        return 'Nenhum usuário encontrado com este email.';
+      case 'auth/invalid-email':
+        return 'Email inválido.';
+      case 'auth/too-many-requests':
+        return 'Muitas tentativas. Tente novamente mais tarde.';
+      default:
+        return 'Erro ao enviar email de redefinição. Tente novamente.';
     }
   }
 

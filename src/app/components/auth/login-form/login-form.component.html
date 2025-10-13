@@ -1,4 +1,4 @@
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" *ngIf="!showResetPasswordForm">
   <div class="login-form__field">
     <input 
       id="email"
@@ -39,7 +39,7 @@
       </button>
     </div>
     <span class="login-form__error" *ngIf="getFieldError('password')">{{ getFieldError('password') }}</span>
-    <a href="#" class="login-form__forgot-link">Forgot password ?</a>
+    <a href="#" class="login-form__forgot-link" (click)="toggleResetPasswordForm(); $event.preventDefault()">Esqueceu a senha?</a>
   </div>
 
   <div class="login-form__remember">
@@ -49,7 +49,7 @@
         formControlName="rememberMe" 
         class="login-form__checkbox-input">
       <span class="login-form__checkbox-custom"></span>
-      <span class="login-form__checkbox-text">Remember me</span>
+      <span class="login-form__checkbox-text">Lembrar-me</span>
     </label>
   </div>
 
@@ -58,11 +58,11 @@
     class="login-form__btn login-form__btn--primary"
     [disabled]="isLoading">
     <span *ngIf="!isLoading">Login</span>
-    <span *ngIf="isLoading">Logging in...</span>
+    <span *ngIf="isLoading">Entrando...</span>
   </button>
 
   <div class="login-form__divider">
-    <span>or</span>
+    <span>ou</span>
   </div>
 
   <button 
@@ -79,3 +79,52 @@
     </svg>
   </button>  
 </form>
+
+<!-- Password Reset Form -->
+<form (ngSubmit)="onResetPassword()" class="login-form" *ngIf="showResetPasswordForm && !resetSuccess">
+  <h2 class="login-form__title">Redefinir Senha</h2>
+  <p class="login-form__subtitle">Insira seu email para receber instruções de redefinição de senha.</p>
+  
+  <div class="login-form__field">
+    <input 
+      type="email" 
+      [(ngModel)]="resetEmail"
+      name="resetEmail"
+      class="login-form__input"
+      placeholder="Seu email">
+  </div>
+
+  <button 
+    type="submit" 
+    class="login-form__btn login-form__btn--primary"
+    [disabled]="isLoading">
+    <span *ngIf="!isLoading">Enviar Instruções</span>
+    <span *ngIf="isLoading">Enviando...</span>
+  </button>
+
+  <div class="login-form__actions">
+    <a href="#" class="login-form__back-link" (click)="toggleResetPasswordForm(); $event.preventDefault()">
+      < Voltar para Login
+    </a>
+  </div>
+</form>
+
+<!-- Password Reset Success Message -->
+<div class="login-form__success" *ngIf="showResetPasswordForm && resetSuccess">
+  <div class="login-form__success-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+  </div>
+  <h2 class="login-form__success-title">Instruções Enviadas!</h2>
+  <p class="login-form__success-message">
+    Enviamos um email com instruções para redefinir sua senha. Verifique sua caixa de entrada.
+  </p>
+  <button 
+    type="button" 
+    class="login-form__btn login-form__btn--secondary"
+    (click)="toggleResetPasswordForm()">
+    Voltar para Login
+  </button>
+</div>

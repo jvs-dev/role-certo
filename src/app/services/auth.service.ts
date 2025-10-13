@@ -2,7 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, 
          User as FirebaseUser, GoogleAuthProvider, signInWithPopup, 
-         updateProfile, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from '@angular/fire/auth';
+         updateProfile, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail } from '@angular/fire/auth';
 import { doc, Firestore, getDoc, setDoc, updateDoc } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
@@ -228,4 +228,16 @@ export class AuthService {
       map(() => this.isAuthenticated())
     );
   }
+
+  async sendPasswordResetEmail(email: string): Promise<void> {
+    if (!this.isBrowser) throw new Error('Auth operations only available in browser');
+    
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      throw error;
+    }
+  }
+
 }
