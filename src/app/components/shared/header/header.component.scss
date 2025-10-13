@@ -28,14 +28,27 @@
 
   &__brand {
     &-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-md);
       font-size: var(--font-size-xl);
       font-weight: 700;
       color: var(--white);
       letter-spacing: 1px;
       margin: 0px;
 
+      img {
+        width: 30px;
+
+        @media (max-width: 768px) {
+          width: 25px;
+        }
+      }
+
       @media (max-width: 768px) {
         font-size: var(--font-size-lg);
+        gap: 6px;
       }
     }
   }
@@ -204,12 +217,12 @@
     @media (max-width: 1024px) {
       display: flex; // Show on mobile when main nav is hidden
     }
-    
+
     // Specific styles for each button type
     &--calendar {
       // Calendar-specific styles if needed
     }
-    
+
     &--geo {
       // Geo-specific styles if needed
     }
