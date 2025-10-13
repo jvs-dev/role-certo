@@ -100,7 +100,7 @@
             <div *ngFor="let event of userEvents.created" class="event-card"
               (click)="navigateToEventDetails(event.eventId)">
               <div class="event-image">
-                <img [src]="event.imageUrl || 'assets/default-event.jpg'" [alt]="event.eventName" class="event-img">
+                <img [src]="event.imageUrl || 'https://img.freepik.com/vetores-premium/icone-emoji-festa-confete-na-rede-social-do-clube-icone-de-vetor-de-biscoito-de-feliz-aniversario_256722-319.jpg'" [alt]="event.eventName" class="event-img">
                 <div class="event-status" [class]="getEventStatusClass(event)">
                   {{ getEventStatusText(event) }}
                 </div>
@@ -142,7 +142,7 @@
             <div *ngFor="let event of userEvents.attending" class="event-card"
               (click)="navigateToEventDetails(event.eventId)">
               <div class="event-image">
-                <img [src]="event.imageUrl || 'assets/default-event.jpg'" [alt]="event.eventName" class="event-img">
+                <img [src]="event.imageUrl || 'https://img.freepik.com/vetores-premium/icone-emoji-festa-confete-na-rede-social-do-clube-icone-de-vetor-de-biscoito-de-feliz-aniversario_256722-319.jpg'" [alt]="event.eventName" class="event-img">
                 <div class="event-status" [class]="getEventStatusClass(event)">
                   {{ getEventStatusText(event) }}
                 </div>
