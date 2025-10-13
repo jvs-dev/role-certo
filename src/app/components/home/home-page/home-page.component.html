@@ -70,7 +70,7 @@
           <div class="home-page__carousel-slide" *ngFor="let event of events; let i = index">
             <div class="home-page__event-card">
               <div class="home-page__event-image">
-                <img [src]="event.imageUrl || 'assets/default-event.jpg'" [alt]="event.eventName"
+                <img [src]="event.imageUrl || 'https://img.freepik.com/vetores-premium/icone-emoji-festa-confete-na-rede-social-do-clube-icone-de-vetor-de-biscoito-de-feliz-aniversario_256722-319.jpg'" [alt]="event.eventName"
                   class="home-page__event-img" />
                 <div class="home-page__event-date" *ngIf="!event.isRecurring">
                   <span class="home-page__event-day">{{
@@ -123,7 +123,7 @@
       <div class="home-page__events-grid">
         <div class="home-page__event-card" *ngFor="let event of upcomingEvents">
           <div class="home-page__event-image">
-            <img [src]="event.imageUrl || 'assets/default-event.jpg'" [alt]="event.eventName"
+            <img [src]="event.imageUrl || 'https://img.freepik.com/vetores-premium/icone-emoji-festa-confete-na-rede-social-do-clube-icone-de-vetor-de-biscoito-de-feliz-aniversario_256722-319.jpg'" [alt]="event.eventName"
               class="home-page__event-img" />
             <div class="home-page__event-date" *ngIf="!event.isRecurring">
               <span class="home-page__event-day">{{
